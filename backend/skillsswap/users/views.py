@@ -133,3 +133,9 @@ def user_skill_detail(request, pk):
     elif request.method == 'DELETE':
         user_skill.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(['GET'])
+def user_skills_for_user_list(request, user_id):
+    user_skills = UserSkill.objects.filter(user_id=user_id)
+    serializer = UserSkillSerializer(user_skills, many=True)
+    return Response(serializer.data)
