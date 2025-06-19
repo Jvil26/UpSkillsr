@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "users.apps.UsersConfig",
-    "skills.apps.SkillsConfig",
-    "storages"
+    "users",
+    "skills",
+    "matches",
+    "storages",
+    "rest_framework"
 ]
 
 MIDDLEWARE = [

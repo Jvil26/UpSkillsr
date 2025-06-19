@@ -1,13 +1,13 @@
 from django.db import models
 from .storages import PublicMediaStorage
+from skills.models import Skill
 
 # Create your models here.
 class User(models.Model):
-    username = models.CharField(max_length=30, null=False)
+    username = models.CharField(max_length=30, null=False, unique=True)
     first_name = models.CharField(max_length=30, null=False)
     last_name = models.CharField(max_length=30, null=False)
     email = models.EmailField(unique=True, null=False)
-    password = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -21,3 +21,25 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{User.username}'s profile, bio - {self.bio}, phone - {self.phone}"
+
+class UserSkill(models.Model):
+    SKILL_TYPES = [
+        ('Offered', 'offered'),
+        ('Wanted', 'wanted')
+    ]
+    PROCIENCY_TYPES = [
+        ('pro', 'Pro'),
+        ('noob', 'Noob'),
+    ]
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='user_skills')
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="user_skill_entries")
+    skill_type = models.CharField(max_length=10, choices=SKILL_TYPES)
+    proficiency = models.CharField(max_length=10, choices=PROCIENCY_TYPES, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.skill.name} ({self.skill_type}) by {self.user.username}"
+    
+    class Meta:
+        unique_together = ('user', 'skill', 'skill_type')

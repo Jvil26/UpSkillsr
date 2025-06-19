@@ -1,49 +1,50 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from skills.models import Skill
-from skills.serializers import SkillSerializer
-# Create your views here.
+from matches.models import MatchRequest
+from matches.serializers import MatchRequestSerializer
 
+# Create your views here.
 @api_view(['GET', 'POST'])
-def skill_list(request):
+def match_request_list(request):
     """
-    List all skills, or create a new skill.
+    List all match requests, or create a new match request.
     """
     if request.method == 'GET':
-        skills = Skill.objects.all()
-        serializer = SkillSerializer(skills, many=True)
+        match_requests = MatchRequest.objects.all()
+        serializer = MatchRequestSerializer(match_requests, many=True)
         return Response(serializer.data)
-
+    
     elif request.method == 'POST':
-        serializer = SkillSerializer(data=request.data)
+        serializer = MatchRequestSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 @api_view(['GET', 'PUT', 'DELETE'])
-def skill_detail(request, pk):
+def match_request_detail(request, pk):
     """
-    Retrieve, update or delete a skill.
+    Retrieve, update or delete a match request.
     """
     try:
-        skill = Skill.objects.get(pk=pk)
-    except Skill.DoesNotExist:
+        match_request = MatchRequest.objects.get(pk=pk)
+    except MatchRequest.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
-        serializer = SkillSerializer(skill)
+        serializer = MatchRequestSerializer(match_request)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = SkillSerializer(skill, data=request.data)
+        serializer = MatchRequestSerializer(match_request, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     elif request.method == 'DELETE':
-        skill.delete()
+        match_request.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

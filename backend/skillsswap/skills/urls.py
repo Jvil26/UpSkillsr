@@ -1,7 +1,8 @@
 from django.urls import path
 
-from . import views
+from skills import views
 
 urlpatterns = [
-    path("", views.index, name="index"),
+    path("", views.skill_list, name="skill-list"),
+    path("<int:id>/", views.skill_detail, name="skill-detail"),
 ]
