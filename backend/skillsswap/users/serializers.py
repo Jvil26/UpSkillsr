@@ -3,20 +3,8 @@ from users.models import User, UserProfile, UserSkill
 from skills.serializers import SkillSerializer
 from skills.models import Skill
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'created_at'
-        ]
-
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source='user', write_only=True
     )
@@ -27,6 +15,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'user_id',
+            'bio',
             'profile_pic',
             'phone'
         ]
@@ -36,7 +25,7 @@ class UserSkillSerializer(serializers.ModelSerializer):
     skill_id = serializers.PrimaryKeyRelatedField(
         queryset=Skill.objects.all(), source='skill', write_only=True
     )
-    user = UserSerializer(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source='user', write_only=True
     )
@@ -52,4 +41,20 @@ class UserSkillSerializer(serializers.ModelSerializer):
             'proficiency',
             'created_at',
             'last_updated'
+        ]
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(read_only=True)
+    user_skills = UserSkillSerializer(many=True, read_only=True)
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'profile',
+            'user_skills',
+            'created_at'
         ]

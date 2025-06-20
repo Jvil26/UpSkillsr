@@ -21,6 +21,15 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{User.username}'s profile, bio - {self.bio}, phone - {self.phone}"
+    
+    def save(self, *args, **kwargs):
+        try:
+            old = UserProfile.objects.get(pk=self.pk)
+            if old.profile_pic and old.profile_pic != self.profile_pic:
+                old.profile_pic.delete(save=False)
+        except UserProfile.DoesNotExist:
+            pass
+        super().save(*args, **kwargs)
 
 class UserSkill(models.Model):
     SKILL_TYPES = [

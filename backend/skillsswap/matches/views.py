@@ -1,8 +1,10 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from matches.models import MatchRequest
 from matches.serializers import MatchRequestSerializer
+from users.models import User
 
 # Create your views here.
 @api_view(['GET', 'POST'])
@@ -48,3 +50,12 @@ def match_request_detail(request, pk):
     elif request.method == 'DELETE':
         match_request.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(['GET'])
+def match_request_for_user_list(request, from_user_id):
+    get_object_or_404(User, pk=from_user_id)
+
+    user_match_requests = MatchRequest.objects.filter(from_user_id=from_user_id)
+    
+    serializer = MatchRequestSerializer(user_match_requests, many=True)
+    return Response(serializer.data)

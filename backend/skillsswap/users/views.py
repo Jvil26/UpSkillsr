@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -136,6 +138,8 @@ def user_skill_detail(request, pk):
     
 @api_view(['GET'])
 def user_skills_for_user_list(request, user_id):
+    get_object_or_404(User, pk=user_id)
     user_skills = UserSkill.objects.filter(user_id=user_id)
+  
     serializer = UserSkillSerializer(user_skills, many=True)
     return Response(serializer.data)
