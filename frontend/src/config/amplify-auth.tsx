@@ -8,7 +8,7 @@ const authConfig: ResourcesConfig = {
       loginWith: {
         oauth: {
           domain: process.env.NEXT_PUBLIC_AWS_DOMAIN as string,
-          scopes: ["openid", "email", "phone"],
+          scopes: ["openid", "email", "phone", "profile", "aws.cognito.signin.user.admin"],
           redirectSignIn: ["http://localhost:3000/"],
           redirectSignOut: ["http://localhost:3000/"],
           responseType: "code",

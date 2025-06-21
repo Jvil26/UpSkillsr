@@ -9,5 +9,5 @@ export default function AmplifyWrapper() {
     Amplify.configure(authConfig);
   }, []);
 
-  return null; // no UI needed here
+  return null;
 }
