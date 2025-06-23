@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -19,22 +20,43 @@ def user_list(request):
         return Response(serializer.data)
     
     elif request.method == 'POST':
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        try:
+            username = request.data.get("username")
+            if not username:
+                return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user_defaults = {
+                "username": username,
+                "name": request.data.get("name"),
+                "email": request.data.get("email"),
+            }
+
+            user, created = User.objects.get_or_create(username=username, defaults=user_defaults)
+
+            profile_defaults = {
+                "user": user,
+                "phone": request.data.get("phone"),
+                "gender": "" if not request.data.get("gender") else request.data.get("gender").lower()
+            }
+            UserProfile.objects.get_or_create(user=user, defaults=profile_defaults)
+
+            serializer = UserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 @api_view(['GET', 'PUT', 'DELETE'])
-def user_detail(request, pk):
+def user_detail(request, username):
     """
     Retrieve, update or delete a user.
     """
     try:
-        user = User.objects.get(pk=pk)
+        user = User.objects.get(username=username)
     except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": f"User with username \"{username}\" does not exist"}, status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
         serializer = UserSerializer(user)
@@ -140,6 +162,5 @@ def user_skill_detail(request, pk):
 def user_skills_for_user_list(request, user_id):
     get_object_or_404(User, pk=user_id)
     user_skills = UserSkill.objects.filter(user_id=user_id)
-  
     serializer = UserSkillSerializer(user_skills, many=True)
     return Response(serializer.data)

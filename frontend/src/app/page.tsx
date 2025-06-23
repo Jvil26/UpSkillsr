@@ -1,13 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { signInWithRedirect, getCurrentUser, type AuthUser, fetchAuthSession, AuthTokens } from "aws-amplify/auth";
+import { toast } from "sonner";
+import { signInWithRedirect, getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
+import { useAuthContext } from "@/context/auth";
+import { useCreateOrFetchUser } from "@/hooks/users";
+import { signOut } from "aws-amplify/auth";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [tokens, setTokens] = useState<AuthTokens | null>(null);
+  const { login, logout, loggedIn } = useAuthContext();
+  const { mutateAsync: createFetchUser, isError } = useCreateOrFetchUser();
 
   useEffect(() => {
     const unsubscribe = Hub.listen("auth", ({ payload }) => {
@@ -16,7 +20,8 @@ export default function Home() {
           getAuth();
           break;
         case "signInWithRedirect_failure":
-          console.log("An error occurred signing in");
+          console.error("An error occurred signing in");
+          toast.error("An error occurred signing in. Please try again.");
           break;
       }
     });
@@ -26,16 +31,30 @@ export default function Home() {
 
   const getAuth = async () => {
     try {
-      const currentUser = await getCurrentUser();
-      const session = await fetchAuthSession();
-      setUser(currentUser);
-      setTokens(session?.tokens || null);
-      console.log("Current User: ", currentUser);
-      console.log("Tokens: ", session?.tokens);
+      if (!loggedIn) {
+        const currentUser = await getCurrentUser();
+        const session = await fetchAuthSession();
+        console.log("Current User: ", currentUser);
+        console.log("Tokens: ", session?.tokens);
+        const tokens = session?.tokens;
+        if (currentUser && tokens) {
+          login(currentUser, tokens);
+          const userData = {
+            username: tokens.idToken?.payload["cognito:username"] as string,
+            email: tokens.idToken?.payload.email as string,
+            gender: tokens.idToken?.payload.gender as string,
+            phone: tokens.idToken?.payload.phone_number as string,
+            name: tokens.idToken?.payload.name as string,
+          };
+          const backendUser = await createFetchUser(userData);
+          console.log(backendUser);
+        }
+      }
     } catch (error) {
       console.error("Not Signed in", error);
-      setUser(null);
-      setTokens(null);
+      toast.error("An error occurred signing in. Please try again.");
+      // await signOut();
+      // logout();
     } finally {
       setLoading(false);
     }
@@ -46,12 +65,19 @@ export default function Home() {
       await signInWithRedirect();
     } catch (error) {
       console.error("Error signing in: ", error);
+      toast.error("An error occurred signing in. Please try again.");
     }
   };
 
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to fetch user details. Please try again.");
+    }
+  }, [isError]);
+
   return (
     <div className="flex justify-center items-center h-screen">
-      {!loading && !user && !tokens && (
+      {!loading && !loggedIn && (
         <Button
           onClick={() => handleSignIn()}
           className="dark:bg-white dark:text-black dark:hover:bg-gray-200 w-60 h-14 text-2xl font-bold"

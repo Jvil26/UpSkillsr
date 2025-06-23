@@ -5,15 +5,13 @@ from skills.models import Skill
 
 # Create your tests here.
 USERNAME1 = 'jusin'
-FIRST_NAME1 = 'Justin'
-LAST_NAME1 = 'Sin'
+NAME1= 'Justin Sin'
 EMAIL1 = 'justinsinsin25@gmail.com'
 PHONE1 = '0123456789'
 BIO1 = 'I am a pro piano player.'
 
 USERNAME2 = 'RySmith'
-FIRST_NAME2 = 'Ryan'
-LAST_NAME2 = 'Smith'
+NAME2 = 'Ryan Smith'
 EMAIL2 = 'RySmith@gmail.com'
 PHONE2 = '9876543210'
 BIO2 = 'I am a pro piano player.'
@@ -23,8 +21,8 @@ class MatchRequestsTests(TestCase):
         self.piano_skill = Skill.objects.create(name="Piano")
         self.programming_skill = Skill.objects.create(name="Programming")
 
-        self.from_user = User.objects.create(username=USERNAME1, first_name=FIRST_NAME1, last_name=LAST_NAME1, email=EMAIL1)
-        self.to_user = User.objects.create(username=USERNAME2, first_name=FIRST_NAME2, last_name=LAST_NAME2, email=EMAIL2)
+        self.from_user = User.objects.create(username=USERNAME1,  name=NAME1, email=EMAIL1)
+        self.to_user = User.objects.create(username=USERNAME2, name=NAME2, email=EMAIL2)
 
         self.piano_user_skill = UserSkill.objects.create(skill=self.piano_skill, user=self.from_user, skill_type='offered', proficiency='pro')
         self.programming_user_skill = UserSkill.objects.create(skill=self.programming_skill, user=self.to_user, skill_type='wanted', proficiency='noob')

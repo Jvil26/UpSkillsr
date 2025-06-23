@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AmplifyWrapper from "./amplifyWrapper";
 import NavMenu from "@/components/ui/navigation";
+import { AuthContextProvider } from "@/context/auth";
+import ClientProvider from "./clientProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,9 +30,18 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <AmplifyWrapper />
-        <NavMenu />
-        {children}
+        <ClientProvider>
+          <AuthContextProvider>
+            <AmplifyWrapper />
+            <NavMenu />
+            {children}
+            <Toaster
+              position="bottom-center"
+              visibleToasts={1}
+              toastOptions={{ className: "!bg-white !text-red-500 !shadow-md" }}
+            />
+          </AuthContextProvider>
+        </ClientProvider>
       </body>
     </html>
   );
