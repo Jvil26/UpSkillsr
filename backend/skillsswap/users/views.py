@@ -8,6 +8,8 @@ from rest_framework import status
 from users.models import User, UserProfile, UserSkill
 from users.serializers import UserSerializer, UserProfileSerializer, UserSkillSerializer
 
+from skills.models import Skill
+
 # Create your views here.
 @api_view(['GET', 'POST'])
 def user_list(request):
@@ -115,7 +117,6 @@ def user_profile_detail(request, pk):
         user_profile.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 @api_view(['GET', 'POST'])
 def user_skill_list(request):
     """
@@ -127,7 +128,8 @@ def user_skill_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = UserSkillSerializer(data=request.data)
+        is_many = isinstance(request.data, list)
+        serializer = UserSkillSerializer(data=request.data, many=is_many)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -159,8 +161,44 @@ def user_skill_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 @api_view(['GET'])
-def user_skills_for_user_list(request, user_id):
-    get_object_or_404(User, pk=user_id)
-    user_skills = UserSkill.objects.filter(user_id=user_id)
+def user_skills_for_user_list(request, username):
+    get_object_or_404(User, username=username)
+    user_skills = UserSkill.objects.filter(user__username=username)
     serializer = UserSkillSerializer(user_skills, many=True)
     return Response(serializer.data)
+
+@api_view(['PUT'])
+def user_skills_sync(request):
+    username = request.data.get("username")
+    if not username:
+        return Response({ "error": "User Username Required" }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return Response({ "error": "User Id Required" }, status=status.HTTP_404_NOT_FOUND)
+    
+    new_user_skills = request.data.get("userSkills", [])
+    new_user_skill_ids = [s["skill"]["id"] for s in new_user_skills]
+
+    UserSkill.objects.filter(user=user).exclude(skill_id__in=new_user_skill_ids).delete()
+
+    for user_skill_data in new_user_skills:
+        skill_id = user_skill_data["skill"]["id"]
+        try:
+            skill_obj = Skill.objects.get(id=skill_id)
+        except Skill.DoesNotExist:
+            continue
+        
+        UserSkill.objects.update_or_create(
+            user=user,
+            skill=skill_obj,
+            defaults={
+                "skill_type": user_skill_data["skillType"],
+                "proficiency": user_skill_data.get("proficiency"),
+            }
+        )
+
+    return Response({"message": "Skills synced."}, status=status.HTTP_200_OK)
+
+

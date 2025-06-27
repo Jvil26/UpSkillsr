@@ -1,6 +1,19 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
+}
+
+// https://stackoverflow.com/questions/8358084/regular-expression-to-reformat-a-us-phone-number-in-javascript
+export function formatPhoneNumber(phoneNumberString: string | undefined) {
+  if (phoneNumberString) {
+    const cleaned = ("" + phoneNumberString).replace(/\D/g, "");
+    const match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      const intlCode = match[1] ? "+1 " : "";
+      return [intlCode, "(", match[2], ") ", match[3], "-", match[4]].join("");
+    }
+  }
+  return "";
 }

@@ -4,18 +4,17 @@ from skills.serializers import SkillSerializer
 from skills.models import Skill
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source='user', write_only=True
+        queryset=User.objects.all(), source='user'
     )
 
     class Meta:
         model = UserProfile
         fields = [
             'id',
-            'user',
             'user_id',
             'bio',
+            'gender',
             'profile_pic',
             'phone'
         ]

@@ -85,6 +85,7 @@ export default function Home() {
           Sign In
         </Button>
       )}
+      <h1>Home Page</h1>
     </div>
   );
 }

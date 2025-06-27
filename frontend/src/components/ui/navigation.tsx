@@ -13,9 +13,10 @@ import Link from "next/link";
 import { Button } from "./button";
 import { signOut } from "aws-amplify/auth";
 import { useAuthContext } from "@/context/auth";
+import { useEffect } from "react";
 
 export default function NavMenu() {
-  const { logout, loggedIn } = useAuthContext();
+  const { logout, loggedIn, user } = useAuthContext();
 
   const handleSignOut = async () => {
     try {
@@ -26,8 +27,12 @@ export default function NavMenu() {
     }
   };
 
+  useEffect(() => {
+    console.log(loggedIn);
+  }, [loggedIn]);
+
   return (
-    <NavigationMenu viewport={false} className="fixed">
+    <NavigationMenu viewport={false} className="fixed h-[var(--nav-height)] z-50">
       <NavigationMenuList className="w-screen justify-start pl-10 dark:bg-slate py-5 dark:bg-slate-100">
         <NavigationMenuItem>
           <NavigationMenuLink
@@ -47,7 +52,7 @@ export default function NavMenu() {
           <NavigationMenuItem className="flex justify-center items-center relative ml-auto mr-8">
             <NavigationMenuTrigger className="hover:!bg-transparent focus:!bg-transparent dark:!bg-white dark:!text-black">
               <NavigationMenuLink asChild>
-                <Link href="/profile/" className="text-lg">
+                <Link href={`/profile/${user?.username}`} className="text-lg">
                   <Avatar className="w-14 h-14 mt-2">
                     <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback>CN</AvatarFallback>
@@ -59,7 +64,7 @@ export default function NavMenu() {
               <ul className="grid w-30 gap-4">
                 <li>
                   <NavigationMenuLink asChild>
-                    <Link href="/profile/">Profile</Link>
+                    <Link href={`/profile/${user?.username}`}>Profile</Link>
                   </NavigationMenuLink>
                   <NavigationMenuLink asChild>
                     <Button
