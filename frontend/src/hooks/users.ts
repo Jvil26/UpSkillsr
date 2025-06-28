@@ -1,5 +1,12 @@
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { createUser, fetchBackendUser, updateUserProfile, createUserSkills, updateUserSkills } from "@/api/users";
+import {
+  createUser,
+  fetchBackendUser,
+  updateUserProfile,
+  createUserSkills,
+  updateUserSkills,
+  updateUserProfilePic,
+} from "@/api/users";
 import { UseQueryResult, UseMutationResult } from "@tanstack/react-query";
 import { User, UserPayload, UserProfile, UserSkills, UpdateUserSkillsPayload } from "@/lib/types";
 
@@ -13,10 +20,10 @@ export function useCreateOrFetchUser(): UseMutationResult<User | undefined, Erro
   });
 }
 
-export function useFetchUser(username: string): UseQueryResult<User | undefined> {
+export function useFetchUser(username?: string): UseQueryResult<User | undefined> {
   return useQuery({
     queryKey: ["backendUser", username],
-    queryFn: () => fetchBackendUser(username),
+    queryFn: () => fetchBackendUser(username!),
     enabled: !!username,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
@@ -25,44 +32,60 @@ export function useFetchUser(username: string): UseQueryResult<User | undefined>
 }
 
 export function useUpdateUserProfile(): UseMutationResult<
-  UserProfile | undefined,
+  User | undefined,
   Error,
-  { updatedProfile: UserProfile; username: string }
+  { updatedProfile: Partial<UserProfile>; username: string }
 > {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ updatedProfile }) => updateUserProfile(updatedProfile),
-    onSuccess: (_, { username }) => {
+    onSuccess: (user, { username }) => {
       if (username) {
-        queryClient.invalidateQueries({ queryKey: ["backendUser", username] });
+        queryClient.setQueryData(["backendUser", username], user);
       }
     },
   });
 }
 
 export function useCreateUserSkills(): UseMutationResult<
-  UserSkills | undefined,
+  User | undefined,
   Error,
   { userSkills: UserSkills; username: string }
 > {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userSkills }) => createUserSkills(userSkills),
-    onSuccess: (_, { username }) => {
+    onSuccess: (user, { username }) => {
       if (username) {
-        queryClient.invalidateQueries({ queryKey: ["backendUser", username] });
+        queryClient.setQueryData(["backendUser", username], user);
       }
     },
   });
 }
 
-export function useUpdateUserSkills(): UseMutationResult<boolean, Error, UpdateUserSkillsPayload> {
+export function useUpdateUserSkills(): UseMutationResult<User | undefined, Error, UpdateUserSkillsPayload> {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateUserSkills,
-    onSuccess: (_, { username }) => {
+    onSuccess: (user, { username }) => {
       if (username) {
-        queryClient.invalidateQueries({ queryKey: ["backendUser", username] });
+        queryClient.setQueryData(["backendUser", username], user);
+      }
+    },
+  });
+}
+
+export function useUpdateUserProfilePic(): UseMutationResult<
+  User | undefined,
+  Error,
+  { userProfileId: number; file: File; username: string }
+> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userProfileId, file }) => updateUserProfilePic({ userProfileId, file }),
+    onSuccess: (user, { username }) => {
+      if (username) {
+        queryClient.setQueryData(["backendUser", username], user);
       }
     },
   });

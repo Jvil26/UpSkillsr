@@ -14,9 +14,11 @@ import { Button } from "./button";
 import { signOut } from "aws-amplify/auth";
 import { useAuthContext } from "@/context/auth";
 import { useEffect } from "react";
+import { useFetchUser } from "@/hooks/users";
 
 export default function NavMenu() {
   const { logout, loggedIn, user } = useAuthContext();
+  const { data: userDetails } = useFetchUser(user?.username);
 
   const handleSignOut = async () => {
     try {
@@ -54,7 +56,7 @@ export default function NavMenu() {
               <NavigationMenuLink asChild>
                 <Link href={`/profile/${user?.username}`} className="text-lg">
                   <Avatar className="w-14 h-14 mt-2">
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarImage src={userDetails?.profile.profile_pic || "https://github.com/shadcn.png"} />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 </Link>

@@ -92,7 +92,7 @@ def user_profile_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT', 'DELETE', 'PATCH'])
 def user_profile_detail(request, pk):
     """
     Retrieve, update or delete a user.
@@ -106,11 +106,12 @@ def user_profile_detail(request, pk):
         serializer = UserProfileSerializer(user_profile)
         return Response(serializer.data)
     
-    elif request.method == 'PUT':
-        serializer = UserProfileSerializer(user_profile, data=request.data)
+    elif request.method == 'PUT' or request.method == 'PATCH':
+        serializer = UserProfileSerializer(user_profile, data=request.data, partial=request.method == 'PATCH')
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            updated_user = UserSerializer(user_profile.user)
+            return Response(updated_user.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     elif request.method == 'DELETE':
@@ -169,6 +170,9 @@ def user_skills_for_user_list(request, username):
 
 @api_view(['PUT'])
 def user_skills_sync(request):
+    """
+    For now use username but later use auth token to get user
+    """ 
     username = request.data.get("username")
     if not username:
         return Response({ "error": "User Username Required" }, status=status.HTTP_400_BAD_REQUEST)
@@ -198,7 +202,7 @@ def user_skills_sync(request):
                 "proficiency": user_skill_data.get("proficiency"),
             }
         )
-
-    return Response({"message": "Skills synced."}, status=status.HTTP_200_OK)
+    updated_user = UserSerializer(user)
+    return Response(updated_user.data, status=status.HTTP_200_OK)
 
 

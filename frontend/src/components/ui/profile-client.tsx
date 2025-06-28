@@ -9,7 +9,7 @@ import { Label } from "./label";
 import { Avatar, AvatarImage, AvatarFallback } from "./avatar";
 import { formatPhoneNumber } from "@/lib/utils";
 import { toast } from "sonner";
-import { useUpdateUserProfile, useUpdateUserSkills } from "@/hooks/users";
+import { useUpdateUserProfile, useUpdateUserSkills, useUpdateUserProfilePic } from "@/hooks/users";
 import { Skills, UserSkillsPayload } from "@/lib/types";
 import { UserProfileSkeleton } from "./user-profile-skeleton";
 
@@ -18,20 +18,38 @@ export default function ProfileClient({ username }: { username: string }) {
   const { data: allSkills, isFetching: isFetchingSkills, isError: isErrorSkills } = useFetchSkills();
   const { mutateAsync: updateUserSkills } = useUpdateUserSkills();
   const { mutateAsync: updateUserProfile } = useUpdateUserProfile();
+  const { mutateAsync: updateUserProfilePic } = useUpdateUserProfilePic();
   const [offeredSkills, setOfferedSkills] = useState<Skills>([]);
   const [wantedSkills, setWantedSkills] = useState<Skills>([]);
   const [bio, setBio] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const isFetching = isFetchingUser || isFetchingSkills;
 
-  const handleSaveProfile = async () => {
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsSaving(true);
     try {
-      setIsSaving(true);
+      const file = e.target.files?.[0];
+      if (file && user) {
+        await updateUserProfilePic({ file: file, userProfileId: user?.profile.id, username: username });
+      }
+    } catch {
+      toast.error("Error uploading image. Try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSaving(true);
+    try {
       if (username && user?.profile) {
         await updateUserProfile({
           username: username,
           updatedProfile: {
-            ...user?.profile,
+            id: user?.profile.id,
+            phone: user?.profile.phone,
+            user_id: user?.profile.user_id,
+            gender: user?.profile.gender,
             bio: bio,
           },
         });
@@ -49,8 +67,8 @@ export default function ProfileClient({ username }: { username: string }) {
       }
       console.log({ username: username, userSkills: userSkills });
       await updateUserSkills({ username: username, userSkills: userSkills });
-    } catch (error) {
-      console.error(error);
+    } catch {
+      toast.error("Error saving profile. Try again.");
     } finally {
       setIsSaving(false);
     }
@@ -68,7 +86,6 @@ export default function ProfileClient({ username }: { username: string }) {
           []
       );
       setBio(user.profile.bio);
-      console.log(user);
     }
   }, [user]);
 
@@ -81,18 +98,28 @@ export default function ProfileClient({ username }: { username: string }) {
   }, [isErrorSkills, isErrorUser]);
 
   if (isFetching) {
-    console.log(isFetchingUser);
     return <UserProfileSkeleton />;
   }
 
   return (
     <>
-      <div className="flex flex-col justify-center items-center gap-y-5">
+      <div className="flex flex-col justify-center items-center gap-y-5 mb-5">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">{user?.username}</h1>
-        <Avatar className="w-6/10 h-6/10 mt-2">
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
+        <Label htmlFor="avatar" className="cursor-pointer justify-center flex-col items-center mb-5">
+          <Avatar className="w-6/10 h-6/10 mt-2 hover:opacity-50">
+            <AvatarImage src={user?.profile.profile_pic || "https://github.com/shadcn.png"} />
+            <AvatarFallback>Profile Image</AvatarFallback>
+          </Avatar>
+          <span>Upload New Profile Image</span>
+          <input
+            type="file"
+            id="avatar"
+            name="avatar"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => handleAvatarUpload(e)}
+          />
+        </Label>
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Name: {user?.name}</h3>
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Email: {user?.email}</h3>
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
