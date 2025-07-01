@@ -8,9 +8,11 @@ export type UserPayload = {
   name: string;
 };
 
+export type Proficiency = "Beginner" | "Intermediate" | "Advanced";
+
 export type UserSkillsPayload = {
   skill: Skill;
-  proficiency: "Beginner" | "Intermediate" | "Advanced";
+  proficiency: Proficiency;
 }[];
 
 export type UpdateUserSkillsPayload = {

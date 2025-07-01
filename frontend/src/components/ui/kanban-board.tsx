@@ -2,6 +2,7 @@
 import KanbanColumn from "./kanban-column";
 import { useState } from "react";
 import { SkillCard } from "./skill-card";
+import { PROFIENCIES } from "@/lib/const";
 import {
   DndContext,
   DragEndEvent,
@@ -12,12 +13,10 @@ import {
   useSensor,
 } from "@dnd-kit/core";
 
-const proficiencyColumns = ["Beginner", "Intermediate", "Advanced"];
-
 const levelTextColors: Record<string, string> = {
-  Beginner: "green-500",
-  Intermediate: "orange-500",
-  Advanced: "red-500",
+  Beginner: "text-green-500",
+  Intermediate: "text-orange-500",
+  Advanced: "text-red-500",
 };
 
 type KanbanBoardProps = {
@@ -73,9 +72,9 @@ export default function KanbanBoard({ userSkills }: KanbanBoardProps) {
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 pt-[calc(var(--nav-height))]">
-        {proficiencyColumns.map((level) => (
+        {PROFIENCIES.map((level) => (
           <KanbanColumn
-            key={level}
+            key={`kanban-column-${level}`}
             level={level}
             droppableId={level}
             userSkills={usrSkills.filter((userSkill) => userSkill.proficiency === level)}
