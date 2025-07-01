@@ -10,8 +10,7 @@ export type UserPayload = {
 
 export type UserSkillsPayload = {
   skill: Skill;
-  skillType: "Offered" | "Wanted";
-  proficiency: "pro" | "noob" | "" | null;
+  proficiency: "Beginner" | "Intermediate" | "Advanced";
 }[];
 
 export type UpdateUserSkillsPayload = {
@@ -30,10 +29,10 @@ export const userSkillSchema = z.object({
   id: z.number(),
   user: z.number(),
   skill: skillSchema,
-  skill_type: z.enum(["Offered", "Wanted"]),
-  proficiency: z.enum(["pro", "noob", ""]).nullable(),
+  proficiency: z.enum(["Beginner", "Intermediate", "Advanced"]),
+  journals: z.array(z.number()),
   created_at: z.string().datetime(),
-  last_updated: z.string().datetime(),
+  updated_at: z.string().datetime(),
 });
 
 export const userSkillsSchema = z.array(userSkillSchema);
@@ -57,8 +56,12 @@ export const userSchema = z.object({
   created_at: z.string().datetime(),
 });
 
+export const usersSchema = z.array(userSchema);
+
+export type Users = z.infer<typeof usersSchema>;
 export type User = z.infer<typeof userSchema>;
 export type UserProfile = z.infer<typeof userProfileSchema>;
 export type Skills = z.infer<typeof skillsSchema>;
 export type UserSkills = z.infer<typeof userSkillsSchema>;
+export type UserSkill = z.infer<typeof userSkillSchema>;
 export type Skill = z.infer<typeof skillSchema>;

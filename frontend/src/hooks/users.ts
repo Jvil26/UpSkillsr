@@ -9,6 +9,7 @@ import {
 } from "@/api/users";
 import { UseQueryResult, UseMutationResult } from "@tanstack/react-query";
 import { User, UserPayload, UserProfile, UserSkills, UpdateUserSkillsPayload } from "@/lib/types";
+import { useAuthContext } from "@/context/auth";
 
 export function useCreateOrFetchUser(): UseMutationResult<User | undefined, Error, UserPayload> {
   const queryClient = useQueryClient();
@@ -20,7 +21,10 @@ export function useCreateOrFetchUser(): UseMutationResult<User | undefined, Erro
   });
 }
 
-export function useFetchUser(username?: string): UseQueryResult<User | undefined> {
+export function useFetchUser(): UseQueryResult<User | undefined> {
+  const { user } = useAuthContext();
+  const username = user?.username;
+
   return useQuery({
     queryKey: ["backendUser", username],
     queryFn: () => fetchBackendUser(username!),

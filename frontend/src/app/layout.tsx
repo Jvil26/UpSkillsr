@@ -6,6 +6,7 @@ import NavMenu from "@/components/ui/navigation";
 import { AuthContextProvider } from "@/context/auth";
 import ClientProvider from "./clientProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthGuard } from "@/components/ui/auth-guard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,12 +35,10 @@ export default function RootLayout({
           <AuthContextProvider>
             <AmplifyWrapper />
             <NavMenu />
-            {children}
-            <Toaster
-              position="bottom-center"
-              visibleToasts={1}
-              toastOptions={{ className: "!bg-white !text-red-500 !shadow-md" }}
-            />
+            <AuthGuard>
+              {children}
+              <Toaster visibleToasts={1} toastOptions={{ className: "!bg-white !text-black !shadow-md" }} />
+            </AuthGuard>
           </AuthContextProvider>
         </ClientProvider>
       </body>

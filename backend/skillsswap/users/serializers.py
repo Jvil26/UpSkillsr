@@ -36,10 +36,10 @@ class UserSkillSerializer(serializers.ModelSerializer):
             'user_id',
             'skill',
             'skill_id',
-            'skill_type',
+            'journals',
             'proficiency',
             'created_at',
-            'last_updated'
+            'updated_at'
         ]
 
 class UserSerializer(serializers.ModelSerializer):

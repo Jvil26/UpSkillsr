@@ -18,7 +18,7 @@ import { useFetchUser } from "@/hooks/users";
 
 export default function NavMenu() {
   const { logout, loggedIn, user } = useAuthContext();
-  const { data: userDetails } = useFetchUser(user?.username);
+  const { data: userDetails } = useFetchUser();
 
   const handleSignOut = async () => {
     try {
@@ -30,8 +30,8 @@ export default function NavMenu() {
   };
 
   useEffect(() => {
-    console.log(loggedIn);
-  }, [loggedIn]);
+    console.log(userDetails);
+  }, [userDetails]);
 
   return (
     <NavigationMenu viewport={false} className="fixed h-[var(--nav-height)] z-50">
@@ -41,13 +41,13 @@ export default function NavMenu() {
             className="text-3xl mr-10 font-bold dark:text-black dark:hover:text-white dark:focus:text-white"
             asChild
           >
-            <Link href="/">SkillsSwap</Link>
+            <Link href="/">SkillLog</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem></NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink className="text-2xl font-medium text-black" asChild>
-            <Link href="/matches/">Matches</Link>
+            <Link href="/journals/">Journals</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
         {loggedIn && (

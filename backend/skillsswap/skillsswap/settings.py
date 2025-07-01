@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "users",
     "skills",
-    "matches",
+    "journals",
     "storages",
     "rest_framework"
 ]

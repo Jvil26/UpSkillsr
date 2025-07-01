@@ -32,23 +32,19 @@ class UserProfile(models.Model):
         super().save(*args, **kwargs)
 
 class UserSkill(models.Model):
-    SKILL_TYPES = [
-        ('Offered', 'offered'),
-        ('Wanted', 'wanted')
-    ]
     PROCIENCY_TYPES = [
-        ('pro', 'Pro'),
-        ('noob', 'Noob'),
+        ('Beginner', 'Beginner'),
+        ('Intermediate', 'Intermediate'),
+        ('Advanced', 'Advanced')
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_skills')
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="user_skill_entries")
-    skill_type = models.CharField(max_length=10, choices=SKILL_TYPES)
-    proficiency = models.CharField(max_length=10, choices=PROCIENCY_TYPES, blank=True, null=True)
+    proficiency = models.CharField(max_length=12, choices=PROCIENCY_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.skill.name} ({self.skill_type}) by {self.user.username}"
+        return f"{self.user.username} - {self.skill.name}, {self.proficiency}"
     
     class Meta:
-        unique_together = ('user', 'skill', 'skill_type')
+        unique_together = ('user', 'skill')

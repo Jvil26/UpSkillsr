@@ -1,91 +1,48 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { signInWithRedirect, getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
-import { Hub } from "aws-amplify/utils";
-import { useAuthContext } from "@/context/auth";
-import { useCreateOrFetchUser } from "@/hooks/users";
-import { signOut } from "aws-amplify/auth";
+import KanbanBoard from "@/components/ui/kanban-board";
+import { useFetchUser } from "@/hooks/users";
 
 export default function Home() {
-  const [loading, setLoading] = useState(true);
-  const { login, logout, loggedIn } = useAuthContext();
-  const { mutateAsync: createFetchUser, isError } = useCreateOrFetchUser();
+  // const { data: currentUser, isFetching: isFetchingCurrentUser } = useFetchUser();
 
-  useEffect(() => {
-    const unsubscribe = Hub.listen("auth", ({ payload }) => {
-      switch (payload.event) {
-        case "signInWithRedirect":
-          getAuth();
-          break;
-        case "signInWithRedirect_failure":
-          console.error("An error occurred signing in");
-          toast.error("An error occurred signing in. Please try again.");
-          break;
-      }
-    });
-    getAuth();
-    return unsubscribe;
-  }, []);
+  const userSkills = [
+    {
+      id: 1,
+      skill: "React",
+      proficiency: "Beginner",
+      created_at: "2025-06-01",
+    },
+    {
+      id: 2,
+      skill: "Python",
+      proficiency: "Intermediate",
+      created_at: "2025-05-20",
+    },
+    {
+      id: 3,
+      skill: "SQL",
+      proficiency: "Advanced",
+      created_at: "2025-04-10",
+    },
+    {
+      id: 4,
+      skill: "Docker",
+      proficiency: "Beginner",
+      created_at: "2025-06-10",
+    },
+    {
+      id: 5,
+      skill: "Django",
+      proficiency: "Intermediate",
+      created_at: "2025-05-15",
+    },
+    {
+      id: 6,
+      skill: "GraphQL",
+      proficiency: "Advanced",
+      created_at: "2025-03-30",
+    },
+  ];
 
-  const getAuth = async () => {
-    try {
-      if (!loggedIn) {
-        const currentUser = await getCurrentUser();
-        const session = await fetchAuthSession();
-        console.log("Current User: ", currentUser);
-        console.log("Tokens: ", session?.tokens);
-        const tokens = session?.tokens;
-        if (currentUser && tokens) {
-          login(currentUser, tokens);
-          const userData = {
-            username: tokens.idToken?.payload["cognito:username"] as string,
-            email: tokens.idToken?.payload.email as string,
-            gender: tokens.idToken?.payload.gender as string,
-            phone: tokens.idToken?.payload.phone_number as string,
-            name: tokens.idToken?.payload.name as string,
-          };
-          const backendUser = await createFetchUser(userData);
-          console.log(backendUser);
-        }
-      }
-    } catch (error) {
-      console.error("Not Signed in", error);
-      toast.error("An error occurred signing in. Please try again.");
-      // await signOut();
-      // logout();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignIn = async () => {
-    try {
-      await signInWithRedirect();
-    } catch (error) {
-      console.error("Error signing in: ", error);
-      toast.error("An error occurred signing in. Please try again.");
-    }
-  };
-
-  useEffect(() => {
-    if (isError) {
-      toast.error("Failed to fetch user details. Please try again.");
-    }
-  }, [isError]);
-
-  return (
-    <div className="flex justify-center items-center h-screen">
-      {!loading && !loggedIn && (
-        <Button
-          onClick={() => handleSignIn()}
-          className="dark:bg-white dark:text-black dark:hover:bg-gray-200 w-60 h-14 text-2xl font-bold"
-        >
-          Sign In
-        </Button>
-      )}
-      <h1>Home Page</h1>
-    </div>
-  );
+  return <KanbanBoard userSkills={userSkills} />;
 }

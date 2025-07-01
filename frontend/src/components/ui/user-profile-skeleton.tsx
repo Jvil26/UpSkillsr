@@ -1,4 +1,3 @@
-"use client";
 import { Skeleton } from "./skeleton";
 
 export function UserProfileSkeleton() {
