@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/auth";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { loggedIn, login } = useAuthContext();
+  const { loggedIn, login, loading } = useAuthContext();
   const router = useRouter();
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -17,16 +17,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       const tokens = JSON.parse(tokensStr);
       login(user, tokens);
       console.log(user, tokens);
+    } else {
+      setAuthChecked(true);
     }
-    setAuthChecked(true);
   }, []);
 
   useEffect(() => {
-    if (authChecked && !loggedIn) {
-      console.log("not logged in");
-      router.replace("/sign-in");
+    console.log(loggedIn, authChecked, loading);
+    if (authChecked && !loggedIn && !loading) {
+      console.log("Not Logged In");
+      router.push("/sign-in");
     }
-  }, [loggedIn, router, authChecked]);
+  }, [loggedIn, router, authChecked, loading]);
 
   return <>{children}</>;
 }

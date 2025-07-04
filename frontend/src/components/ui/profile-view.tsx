@@ -7,12 +7,12 @@ import { Label } from "./label";
 import { Avatar, AvatarImage, AvatarFallback } from "./avatar";
 import { formatPhoneNumber } from "@/lib/utils";
 import { toast } from "sonner";
-import { useUpdateUserProfile, useUpdateUserProfilePic } from "@/hooks/users";
+import { useUpdateUserProfileById, useUpdateUserProfilePic } from "@/hooks/users";
 import { UserProfileSkeleton } from "./user-profile-skeleton";
 
-export default function ProfileView({ username }: { username: string }) {
+export default function ProfileView() {
   const { data: user, isFetching: isFetchingUser, isError: isErrorUser } = useFetchUser();
-  const { mutateAsync: updateUserProfile } = useUpdateUserProfile();
+  const { mutateAsync: updateUserProfileById } = useUpdateUserProfileById();
   const { mutateAsync: updateUserProfilePic } = useUpdateUserProfilePic();
   //const [userSkills, setUserSkills] = useState<Skills>([]);
   const [bio, setBio] = useState<string>("");
@@ -23,7 +23,7 @@ export default function ProfileView({ username }: { username: string }) {
     try {
       const file = e.target.files?.[0];
       if (file && user) {
-        await updateUserProfilePic({ file: file, userProfileId: user?.profile.id, username: username });
+        await updateUserProfilePic({ file: file, userProfileId: user?.profile.id });
       }
     } catch {
       toast.error("Error uploading image. Try again.");
@@ -35,14 +35,14 @@ export default function ProfileView({ username }: { username: string }) {
   const handleSaveProfile = async () => {
     setIsSaving(true);
     try {
-      if (username && user?.profile) {
-        await updateUserProfile({
-          username: username,
+      if (user && user?.profile) {
+        await updateUserProfileById({
+          id: user.profile.id,
           updatedProfile: {
-            id: user?.profile.id,
-            phone: user?.profile.phone,
-            user_id: user?.profile.user_id,
-            gender: user?.profile.gender,
+            id: user.profile.id,
+            phone: user.profile.phone,
+            user_id: user.profile.user_id,
+            gender: user.profile.gender,
             bio: bio,
           },
         });
@@ -71,7 +71,7 @@ export default function ProfileView({ username }: { username: string }) {
   }
 
   return (
-    <>
+    <div className="flex justify-evenly items-center p-8 min-h-screen overflow-y-auto sm:flex-row flex-col pt-[calc(var(--nav-height))]">
       <div className="flex flex-col justify-center items-center gap-y-5 mb-5">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">{user?.username}</h1>
         <Label htmlFor="avatar" className="cursor-pointer justify-center flex-col items-center mb-5">
@@ -114,6 +114,6 @@ export default function ProfileView({ username }: { username: string }) {
           Save Profile
         </Button>
       </div>
-    </>
+    </div>
   );
 }

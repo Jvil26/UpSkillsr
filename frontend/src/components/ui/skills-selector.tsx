@@ -10,12 +10,12 @@ import { skillsSchema, Skill, skillSchema } from "@/lib/types";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SkillSelectorProps = z.object({
-  allSkills: skillsSchema.optional(),
+  availableSkills: skillsSchema,
   selected: skillSchema.nullable(),
   setSelected: z.function().args(skillSchema.nullable()).returns(z.void()),
 });
 
-export default function SkillSelector({ allSkills, selected, setSelected }: z.infer<typeof SkillSelectorProps>) {
+export default function SkillSelector({ availableSkills, selected, setSelected }: z.infer<typeof SkillSelectorProps>) {
   const toggleSkill = (skill: Skill) => {
     if (selected?.id == skill.id) {
       setSelected(null);
@@ -42,7 +42,7 @@ export default function SkillSelector({ allSkills, selected, setSelected }: z.in
           <Command>
             <CommandInput placeholder="Search skills..." />
             <CommandGroup className="max-h-60 overflow-y-auto">
-              {allSkills?.map((skill) => (
+              {availableSkills?.map((skill) => (
                 <CommandItem
                   key={skill.id}
                   onSelect={() => toggleSkill(skill)}

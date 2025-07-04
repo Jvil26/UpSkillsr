@@ -48,7 +48,7 @@ def journals_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 @api_view(['GET'])
-def journal_by_user(request, username):
+def journals_by_user(request, username):
     """
     Get all journals for a specific user given username
     """
@@ -57,7 +57,7 @@ def journal_by_user(request, username):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def journal_by_user_skill(request, user_skill_id):
+def journals_by_user_skill(request, user_skill_id):
     """
     Get all journals for a user_skill
     """

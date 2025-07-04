@@ -12,13 +12,14 @@ import {
 import { Plus } from "lucide-react";
 import SkillSelector from "./skills-selector";
 import { ProficiencySelect } from "./proficiency-select";
-import { Skill, Proficiency } from "@/lib/types";
+import { Skill, Proficiency, Skills } from "@/lib/types";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 type CreateUserSkillDialogProps = {
   open: boolean;
   level: Proficiency;
   selectedSkill: Skill | null;
+  availableSkills: Skills;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onOpenChange: (isOpen: boolean) => void;
@@ -31,6 +32,7 @@ export function CreateUserSkillDialog({
   open,
   level,
   selectedSkill,
+  availableSkills,
   onSubmit,
   onOpenChange,
   onClose,
@@ -38,17 +40,6 @@ export function CreateUserSkillDialog({
   setSelectedSkill,
   setProficiency,
 }: CreateUserSkillDialogProps) {
-  const allSkills = [
-    { id: 1, name: "Python" },
-    { id: 2, name: "Piano" },
-    { id: 3, name: "Java" },
-    { id: 4, name: "Guitar" },
-    { id: 5, name: "Drums" },
-    { id: 6, name: "Spanish" },
-    { id: 7, name: "Chinese" },
-    { id: 8, name: "Javascript" },
-  ];
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -64,7 +55,11 @@ export function CreateUserSkillDialog({
           </DialogHeader>
           <div className="grid">
             <div className="grid gap-2">
-              <SkillSelector allSkills={allSkills} selected={selectedSkill} setSelected={setSelectedSkill} />
+              <SkillSelector
+                availableSkills={availableSkills}
+                selected={selectedSkill}
+                setSelected={setSelectedSkill}
+              />
             </div>
             <div className="grid gap-3">
               <ProficiencySelect defaultValue={level} setProficiency={setProficiency} />

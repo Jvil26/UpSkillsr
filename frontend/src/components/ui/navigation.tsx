@@ -13,7 +13,6 @@ import Link from "next/link";
 import { Button } from "./button";
 import { signOut } from "aws-amplify/auth";
 import { useAuthContext } from "@/context/auth";
-import { useEffect } from "react";
 import { useFetchUser } from "@/hooks/users";
 
 export default function NavMenu() {
@@ -28,10 +27,6 @@ export default function NavMenu() {
       console.error("Error signing out: ", error);
     }
   };
-
-  useEffect(() => {
-    console.log(userDetails);
-  }, [userDetails]);
 
   return (
     <NavigationMenu viewport={false} className="fixed h-[var(--nav-height)] z-50">

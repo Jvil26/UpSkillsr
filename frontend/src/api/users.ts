@@ -1,4 +1,15 @@
-import { userSchema, User, UserPayload, UserProfile, UserSkills, UpdateUserSkillsPayload } from "@/lib/types";
+import {
+  userSchema,
+  User,
+  UserPayload,
+  UserProfile,
+  UserSkills,
+  UpdateUserSkillsPayload,
+  userSkillsSchema,
+  UserSkill,
+  userSkillSchema,
+  CreateUserSkillPayload,
+} from "@/lib/types";
 
 export async function createUser(userData: UserPayload): Promise<User | undefined> {
   try {
@@ -18,6 +29,7 @@ export async function createUser(userData: UserPayload): Promise<User | undefine
     return validatedUser;
   } catch (error) {
     console.error("Create User Failed ", error);
+    throw new Error();
   }
 }
 
@@ -35,16 +47,19 @@ export async function fetchBackendUser(username: string): Promise<User | undefin
     return validatedUser;
   } catch (error) {
     console.error("Fetch Backend User Failed ", error);
+    throw new Error();
   }
 }
 
-export async function updateUserProfile(userProfileData: Partial<UserProfile>): Promise<User | undefined> {
+export async function updateUserProfileById(
+  id: number,
+  userProfileData: Partial<UserProfile>
+): Promise<User | undefined> {
   try {
     console.log(userProfileData);
-    const { id, ...updatedUserProfile } = userProfileData;
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/profiles/${id}/`, {
-      method: "PATCH",
-      body: JSON.stringify(updatedUserProfile),
+      method: "PUT",
+      body: JSON.stringify(userProfileData),
       headers: {
         "Content-Type": "application/json",
       },
@@ -58,11 +73,45 @@ export async function updateUserProfile(userProfileData: Partial<UserProfile>): 
     const validatedUser = userSchema.parse(resJSON);
     return validatedUser;
   } catch (error) {
-    console.error("Update User Profile Failed ", error);
+    console.error("Update User Profile by id Failed ", error);
+    throw new Error();
   }
 }
 
-export async function createUserSkills(userSkillsData: UserSkills): Promise<User | undefined> {
+export async function fetchUserSkills(username: string): Promise<UserSkills | undefined> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${username}/skills/`);
+
+    const resJSON = await res.json();
+    if (!res.ok) {
+      throw new Error(JSON.stringify(resJSON));
+    }
+
+    const validatedUserSkills = userSkillsSchema.parse(resJSON);
+    return validatedUserSkills;
+  } catch (error) {
+    console.error("Fetch User Skills Failed ", error);
+    throw new Error();
+  }
+}
+
+export async function fetchUserSkillById(id: number): Promise<UserSkill | undefined> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}/`);
+    const resJSON = await res.json();
+    if (!res.ok) {
+      throw new Error(JSON.stringify(resJSON));
+    }
+
+    const validatedUserSkill = userSkillSchema.parse(resJSON);
+    return validatedUserSkill;
+  } catch (error) {
+    console.error(`Failed to get user skill by id: ${id}`, error);
+    throw new Error();
+  }
+}
+
+export async function createUserSkills(userSkillsData: UserSkills): Promise<UserSkills | undefined> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/`, {
       method: "POST",
@@ -77,14 +126,38 @@ export async function createUserSkills(userSkillsData: UserSkills): Promise<User
       throw new Error(JSON.stringify(resJSON));
     }
 
-    const validatedUser = userSchema.parse(resJSON);
-    return validatedUser;
+    const validatedUserSkills = userSkillsSchema.parse(resJSON);
+    return validatedUserSkills;
   } catch (error) {
-    console.error("Update User Profile Failed ", error);
+    console.error("Failed to Create User Skill", error);
+    throw new Error();
   }
 }
 
-export async function updateUserSkills(data: UpdateUserSkillsPayload): Promise<User | undefined> {
+export async function createUserSkill(userSkillData: CreateUserSkillPayload): Promise<UserSkill | undefined> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/`, {
+      method: "POST",
+      body: JSON.stringify(userSkillData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const resJSON = await res.json();
+    if (!res.ok) {
+      throw new Error(JSON.stringify(resJSON));
+    }
+
+    const validatedUserSkill = userSkillSchema.parse(resJSON);
+    return validatedUserSkill;
+  } catch (error) {
+    console.error("Failed to Create User Skill", error);
+    throw new Error();
+  }
+}
+
+export async function updateUserSkill(data: UpdateUserSkillsPayload): Promise<UserSkill | undefined> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/sync/`, {
       method: "PUT",
@@ -99,16 +172,22 @@ export async function updateUserSkills(data: UpdateUserSkillsPayload): Promise<U
       throw new Error(JSON.stringify(resJSON));
     }
 
-    const validatedUser = userSchema.parse(resJSON);
-    return validatedUser;
+    const validatedUserSkill = userSkillSchema.parse(resJSON);
+    return validatedUserSkill;
   } catch (error) {
     console.error("Update User Profile Failed ", error);
+    throw new Error();
   }
 }
 
-export async function updateUserProfilePic(data: { userProfileId: number; file: File }): Promise<User | undefined> {
+export async function updateUserProfilePic({
+  userProfileId,
+  file,
+}: {
+  userProfileId: number;
+  file: File;
+}): Promise<User | undefined> {
   try {
-    const { userProfileId, file } = data;
     const formData = new FormData();
     formData.append("profile_pic", file);
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/profiles/${userProfileId}/`, {
@@ -125,5 +204,6 @@ export async function updateUserProfilePic(data: { userProfileId: number; file: 
     return validatedUser;
   } catch (error) {
     console.error("Update User Profile Failed", error);
+    throw new Error();
   }
 }

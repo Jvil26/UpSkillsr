@@ -3,38 +3,46 @@ import { useState } from "react";
 import { SkillCard } from "./skill-card";
 import { Droppable } from "./droppable";
 import { CreateUserSkillDialog } from "./create-user-skill-dialog";
-import { Skill } from "@/lib/types";
+import { Skill, Skills, UserSkills } from "@/lib/types";
 import { toast } from "sonner";
 import { Proficiency } from "@/lib/types";
+import { useCreateUserSkill } from "@/hooks/users";
 
 type KanbanColumnProps = {
   level: Proficiency;
   droppableId: string;
-  userSkills: {
-    id: number;
-    skill: string;
-    proficiency: string;
-    created_at: string;
-  }[];
+  userSkills: UserSkills;
   textColor: string;
+  availableSkills: Skills;
 };
 
-export default function KanbanColumn({ level, droppableId, userSkills, textColor }: KanbanColumnProps) {
+export default function KanbanColumn({
+  level,
+  droppableId,
+  userSkills,
+  textColor,
+  availableSkills,
+}: KanbanColumnProps) {
+  const { mutateAsync: createUserSkill } = useCreateUserSkill();
   const [open, setOpen] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [proficiency, setProficiency] = useState<Proficiency>(level);
 
-  const handleCreateUserSkill = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("here");
+  const handleCreateUserSkill = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedSkill) {
-      toast.error("Failed to create user skill. Please select a skill.");
-      return;
+    try {
+      if (!selectedSkill) {
+        toast.error("Failed to create user skill. Please select a skill.");
+        return;
+      }
+      await createUserSkill({ user_id: userSkills[0].user, skill_id: selectedSkill.id, proficiency: proficiency });
+      setOpen(false);
+      setSelectedSkill(null);
+      setProficiency(level);
+      toast.success(`Successfully created: ${selectedSkill.name} ${proficiency}`);
+    } catch {
+      toast.error("Failed to create user skill");
     }
-    toast.success(`Successfully created: ${selectedSkill.name} ${proficiency}`);
-    setOpen(false);
-    setSelectedSkill(null);
-    setProficiency(level);
   };
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -65,13 +73,20 @@ export default function KanbanColumn({ level, droppableId, userSkills, textColor
           setOpen={setOpen}
           onOpenChange={handleOpenChange}
           onClose={handleCloseDialog}
+          availableSkills={availableSkills}
         />
       </h2>
       <div className="space-y-3 flex flex-col">
         {userSkills
-          .filter((skill) => skill.proficiency === level)
-          .map((skill) => (
-            <SkillCard key={skill.id} userSkill={skill} />
+          .filter((us) => us.proficiency === level)
+          .map((us) => (
+            <SkillCard
+              key={us.id}
+              id={us.id}
+              skillName={us.skill.name}
+              proficiency={us.proficiency}
+              created_at={us.created_at}
+            />
           ))}
       </div>
     </Droppable>

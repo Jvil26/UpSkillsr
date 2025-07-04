@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuthContext } from "@/context/auth";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -7,18 +7,18 @@ import { useCreateOrFetchUser } from "@/hooks/users";
 import { signInWithRedirect, getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export default function SignIn() {
-  const [loading, setLoading] = useState(false);
-  const { login, loggedIn } = useAuthContext();
+  const { login, loggedIn, loading, setLoading } = useAuthContext();
   const { mutateAsync: createFetchUser, isError } = useCreateOrFetchUser();
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = Hub.listen("auth", ({ payload }) => {
+    const unsubscribe = Hub.listen("auth", async ({ payload }) => {
       switch (payload.event) {
         case "signInWithRedirect":
-          getAuth();
+          await getAuth();
           break;
         case "signInWithRedirect_failure":
           console.error("An error occurred signing in");
@@ -27,11 +27,11 @@ export default function SignIn() {
       }
     });
 
-    getAuth();
     return unsubscribe;
   }, []);
 
   const getAuth = async () => {
+    setLoading(true);
     try {
       if (!loggedIn) {
         const currentUser = await getCurrentUser();
@@ -66,12 +66,14 @@ export default function SignIn() {
   };
 
   const handleSignIn = async () => {
+    setLoading(true);
     try {
       await signInWithRedirect();
     } catch (error) {
       console.error("Error signing in: ", error);
       toast.error("An error occurred signing in. Please try again.");
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -84,18 +86,18 @@ export default function SignIn() {
     console.log("LoggedIn: ", loggedIn, "Loading: ", loading);
   }, []);
 
-  if (loading) {
-    return <div className="h-5 w-5 animate-spin rounded-full border-2 border-t-transparent border-black" />;
-  }
-
   return (
     <div className="flex justify-evenly items-center min-h-screen overflow-y-auto sm:flex-row flex-col">
-      <Button
-        onClick={() => handleSignIn()}
-        className="dark:bg-white dark:text-black dark:hover:bg-gray-200 w-60 h-14 text-lg font-semibold"
-      >
-        Sign In with Cognito
-      </Button>
+      {loading || loggedIn ? (
+        <Loader2 />
+      ) : (
+        <Button
+          onClick={handleSignIn}
+          className="dark:bg-white dark:text-black dark:hover:bg-gray-200 w-60 h-14 text-lg font-semibold"
+        >
+          Sign In with Cognito
+        </Button>
+      )}
     </div>
   );
 }

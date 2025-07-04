@@ -1,6 +1,7 @@
 from django.db import models
 from .storages import PublicMediaStorage
 from skills.models import Skill
+from journals.models import Journal
 
 # Create your models here.
 class User(models.Model):
@@ -39,7 +40,7 @@ class UserSkill(models.Model):
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_skills')
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="user_skill_entries")
-    proficiency = models.CharField(max_length=12, choices=PROCIENCY_TYPES)
+    proficiency = models.CharField(max_length=15, choices=PROCIENCY_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

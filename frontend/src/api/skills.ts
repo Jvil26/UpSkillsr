@@ -11,5 +11,6 @@ export async function fetchAllSkills(): Promise<Skills | undefined> {
     return validatedSkills;
   } catch (error) {
     console.error("Fetch skills Failed ", error);
+    throw new Error();
   }
 }

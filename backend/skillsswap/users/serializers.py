@@ -2,6 +2,8 @@ from rest_framework import serializers
 from users.models import User, UserProfile, UserSkill
 from skills.serializers import SkillSerializer
 from skills.models import Skill
+from journals.models import Journal
+from journals.serializers import JournalSerializer
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(
@@ -28,14 +30,16 @@ class UserSkillSerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source='user', write_only=True
     )
+    journals = JournalSerializer(many=True, read_only=True)
+
     class Meta:
         model = UserSkill
         fields = [
             'id',
             'user',
             'user_id',
-            'skill',
             'skill_id',
+            'skill',
             'journals',
             'proficiency',
             'created_at',
