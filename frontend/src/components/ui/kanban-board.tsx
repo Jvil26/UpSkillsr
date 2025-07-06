@@ -14,12 +14,6 @@ import {
 } from "@dnd-kit/core";
 import { UserSkills, Proficiency, UserSkill, Skills } from "@/lib/types";
 
-const levelTextColors: Record<string, string> = {
-  Beginner: "text-green-500",
-  Intermediate: "text-orange-500",
-  Advanced: "text-red-500",
-};
-
 type KanbanBoardProps = {
   userSkills: UserSkills;
   availableSkills: Skills;
@@ -82,7 +76,6 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
             droppableId={level}
             userSkills={usrSkills.filter((userSkill) => userSkill.proficiency === level)}
             availableSkills={availableSkills}
-            textColor={levelTextColors[level]}
           />
         ))}
       </div>

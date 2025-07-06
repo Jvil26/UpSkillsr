@@ -6,8 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { extractYouTubeId } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useCreateJournal, useFetchJournalById, useUpdateJournalById } from "@/hooks/journals";
+import {
+  useCreateJournal,
+  useFetchJournalById,
+  useGenerateJournalSummary,
+  useUpdateJournalById,
+} from "@/hooks/journals";
 
 type JournalViewProps = {
   isNew?: boolean;
@@ -15,19 +21,24 @@ type JournalViewProps = {
   userSkillId: number;
 };
 export default function JournalView({ isNew, journalId, userSkillId }: JournalViewProps) {
-  const { data: journal } = useFetchJournalById(journalId, { enabled: !isNew && !!journalId });
+  const { data: journal, isFetching: isFetchingJournal } = useFetchJournalById(journalId, {
+    enabled: !isNew && !!journalId,
+  });
   const [title, setTitle] = useState<string>("");
   const [textContent, setTextContent] = useState<string>("");
   const [media, setMedia] = useState<File | null>(null);
   const [youtubeURL, setYoutubeURL] = useState<string>("");
-  const { mutateAsync: createJournal } = useCreateJournal(userSkillId);
-  const { mutateAsync: updateJournalById } = useUpdateJournalById(userSkillId);
+  const [aiSummary, setAISummary] = useState<string>("");
+  const { mutateAsync: createJournal, isPending: createPending } = useCreateJournal(userSkillId);
+  const { mutateAsync: updateJournalById, isPending: updatePending } = useUpdateJournalById(userSkillId);
+  const { mutateAsync: generateSummary, isPending: isGeneratingSummary } = useGenerateJournalSummary();
 
   useEffect(() => {
     if (journal) {
       setTitle(journal.title || "");
       setTextContent(journal.text_content || "");
       setYoutubeURL(journal.youtube_url || "");
+      setAISummary(journal.ai_summary || "");
     }
   }, [journal]);
 
@@ -38,47 +49,60 @@ export default function JournalView({ isNew, journalId, userSkillId }: JournalVi
     }
   };
 
+  const handleGenerateSummary = async () => {
+    try {
+      if (textContent) {
+        const summary = await generateSummary(textContent);
+        setAISummary(summary);
+      }
+    } catch {
+      toast.error("Error generating journal summary.");
+    }
+  };
+
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(title, textContent, youtubeURL);
-    if (!title) {
-      toast.error("Failed to journal. Title cannot be empty");
-      return;
-    }
-    if (!textContent) {
-      toast.error("Failed to journal. Content cannot be empty");
-      return;
-    }
-    if (youtubeURL) {
-      const url = youtubeURL.trim().toLowerCase();
-      if (url && !url.includes("youtube.com") && !url.includes("youtu.be")) {
-        toast.error("Failed to journal. Please provide a valid YouTube link or upload a file.");
+    try {
+      if (!title) {
+        toast.error("Failed to journal. Title cannot be empty");
         return;
       }
-    }
-    const formData = new FormData();
-    formData.append("user_skill", String(userSkillId));
-    formData.append("title", title);
-    formData.append("text_content", textContent);
-    if (media) formData.append("media", media);
-    if (youtubeURL) formData.append("youtube_url", youtubeURL);
-    try {
-      console.log(Object.fromEntries(formData.entries()));
+      if (!textContent) {
+        toast.error("Failed to journal. Content cannot be empty");
+        return;
+      }
+      if (youtubeURL) {
+        const url = youtubeURL.trim().toLowerCase();
+        if (url && !url.includes("youtube.com") && !url.includes("youtu.be")) {
+          toast.error("Failed to journal. Please provide a valid YouTube link or upload a file.");
+          return;
+        }
+      }
+      const formData = new FormData();
+      formData.append("user_skill", String(userSkillId));
+      formData.append("title", title);
+      formData.append("text_content", textContent);
+      formData.append("ai_summary", aiSummary);
+      if (media) formData.append("media", media);
+      if (youtubeURL) formData.append("youtube_url", youtubeURL);
       if (isNew) {
         await createJournal(formData);
       } else {
         await updateJournalById({ id: journalId, journalData: formData });
       }
       toast.success("Journal saved successfully!");
-      // TODO: send formData to backend with fetch or axios
       console.log("Saving journal:", Object.fromEntries(formData.entries()));
     } catch {
       toast.error("Failed to save journal.");
     }
   };
 
+  if (isFetchingJournal) {
+    return <Loader2 className="h-10 w-10 animate-spin" />;
+  }
+
   return (
-    <div className="min-h-screen bg-muted pt-[calc(var(--nav-height))] p-1 sm:p-10">
+    <div className="min-h-screen bg-muted pt-[calc(var(--nav-height))] p-1 sm:px-10 sm:pb-10">
       <h1 className="text-[3rem] mt-5 font-bold text-center underline underline-offset-12">{isNew && "New"} Journal</h1>
       <form onSubmit={(e) => handleSave(e)} className="flex flex-col gap-y-7">
         <div>
@@ -99,6 +123,30 @@ export default function JournalView({ isNew, journalId, userSkillId }: JournalVi
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
             className="!text-[1.1rem] min-h-60"
+          />
+        </div>
+
+        <div className="mt-4">
+          <div className="pb-1 text-[1.8rem] flex items-center justify-between">
+            AI Summary
+            <Button
+              type="button"
+              size="sm"
+              className="text-sm"
+              onClick={handleGenerateSummary}
+              disabled={isGeneratingSummary}
+            >
+              {isGeneratingSummary ? "Generating..." : "Generate AI Summary"}
+            </Button>
+          </div>
+
+          <Textarea
+            id="ai-summary"
+            rows={4}
+            value={aiSummary}
+            onChange={(e) => setAISummary(e.target.value)}
+            className="!text-[1.1rem] min-h-40 mt-2"
+            placeholder="AI-generated summary will appear here"
           />
         </div>
 
@@ -146,8 +194,8 @@ export default function JournalView({ isNew, journalId, userSkillId }: JournalVi
           )}
         </div>
         <div className="flex justify-center items-center mt-5">
-          <Button className="text-[1rem] p-5" type="submit">
-            Save Changes
+          <Button className="text-[1rem] p-5 w-full" type="submit" disabled={updatePending || createPending}>
+            {updatePending || createPending ? "Saving..." : "Save"}
           </Button>
         </div>
       </form>

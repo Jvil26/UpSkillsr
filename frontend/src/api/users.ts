@@ -4,7 +4,6 @@ import {
   UserPayload,
   UserProfile,
   UserSkills,
-  UpdateUserSkillsPayload,
   userSkillsSchema,
   UserSkill,
   userSkillSchema,
@@ -157,9 +156,9 @@ export async function createUserSkill(userSkillData: CreateUserSkillPayload): Pr
   }
 }
 
-export async function updateUserSkill(data: UpdateUserSkillsPayload): Promise<UserSkill | undefined> {
+export async function updateUserSkillById(id: number, data: CreateUserSkillPayload): Promise<UserSkill | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/sync/`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
       headers: {
@@ -175,7 +174,24 @@ export async function updateUserSkill(data: UpdateUserSkillsPayload): Promise<Us
     const validatedUserSkill = userSkillSchema.parse(resJSON);
     return validatedUserSkill;
   } catch (error) {
-    console.error("Update User Profile Failed ", error);
+    console.error("Update User Skill Failed ", error);
+    throw new Error();
+  }
+}
+
+export async function deleteUserSkillById(id: number): Promise<number> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}/`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      const resJSON = await res.json();
+      throw new Error(JSON.stringify(resJSON));
+    }
+
+    return id;
+  } catch (error) {
+    console.error(`Delete User Skill by Id: ${id} Failed`, error);
     throw new Error();
   }
 }

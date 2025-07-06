@@ -15,8 +15,8 @@ export type UserSkillsPayload = {
   proficiency: Proficiency;
 }[];
 
-export type UpdateUserSkillsPayload = {
-  username: string;
+export type UpdateUserSkillPayload = {
+  id: number;
   userSkills: UserSkillsPayload;
 };
 
@@ -40,6 +40,7 @@ export const journalSchema = z.object({
   text_content: z.string(),
   media: z.string().nullable(),
   youtube_url: z.string().nullable(),
+  ai_summary: z.string().nullable(),
   created_at: z.string(),
 });
 

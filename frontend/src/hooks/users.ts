@@ -5,21 +5,14 @@ import {
   fetchUserSkills,
   createUserSkills,
   createUserSkill,
-  updateUserSkill,
+  updateUserSkillById,
   updateUserProfilePic,
   fetchUserSkillById,
   updateUserProfileById,
+  deleteUserSkillById,
 } from "@/api/users";
 import { UseQueryResult, UseMutationResult } from "@tanstack/react-query";
-import {
-  User,
-  UserPayload,
-  UserProfile,
-  UserSkills,
-  UpdateUserSkillsPayload,
-  UserSkill,
-  CreateUserSkillPayload,
-} from "@/lib/types";
+import { User, UserPayload, UserProfile, UserSkills, UserSkill, CreateUserSkillPayload } from "@/lib/types";
 import { useAuthContext } from "@/context/auth";
 
 export function useCreateOrFetchUser(): UseMutationResult<User | undefined, Error, UserPayload> {
@@ -112,13 +105,17 @@ export function useCreateUserSkill(): UseMutationResult<UserSkill | undefined, E
   });
 }
 
-export function useUpdateUserSkill(): UseMutationResult<UserSkill | undefined, Error, UpdateUserSkillsPayload> {
+export function useUpdateUserSkillById(): UseMutationResult<
+  UserSkill | undefined,
+  Error,
+  { id: number; data: CreateUserSkillPayload }
+> {
   const { user } = useAuthContext();
   const username = user?.username;
 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: updateUserSkill,
+    mutationFn: ({ id, data }) => updateUserSkillById(id, data),
     onSuccess: (updatedSkill) => {
       if (username && updatedSkill) {
         queryClient.setQueryData(["userSkills", username], (oldUserSkills: UserSkills | undefined) => {
@@ -128,6 +125,33 @@ export function useUpdateUserSkill(): UseMutationResult<UserSkill | undefined, E
         });
       }
     },
+  });
+}
+
+export function useDeleteUserSkillById(): UseMutationResult<number | undefined, Error, number> {
+  const { user } = useAuthContext();
+  const username = user?.username;
+
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteUserSkillById,
+    onSuccess: (deletedId) => {
+      if (username && deletedId) {
+        queryClient.setQueryData(["userSkills", username], (oldUserSkills: UserSkills | undefined) => {
+          if (!oldUserSkills) return oldUserSkills;
+          return oldUserSkills.filter((us) => us.id !== deletedId);
+        });
+      }
+    },
+  });
+}
+
+export function useFetchUserSkillById(id: number): UseQueryResult<UserSkill | undefined> {
+  return useQuery({
+    queryKey: ["userSkill", id],
+    queryFn: () => fetchUserSkillById(id!),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -147,14 +171,5 @@ export function useUpdateUserProfilePic(): UseMutationResult<
         queryClient.setQueryData(["backendUser", username], updatedUser);
       }
     },
-  });
-}
-
-export function useFetchUserSkillById(id: number): UseQueryResult<UserSkill | undefined> {
-  return useQuery({
-    queryKey: ["userSkill", id],
-    queryFn: () => fetchUserSkillById(id!),
-    enabled: !!id,
-    staleTime: 1000 * 60 * 5,
   });
 }

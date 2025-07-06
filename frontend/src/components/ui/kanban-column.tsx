@@ -2,27 +2,21 @@
 import { useState } from "react";
 import { SkillCard } from "./skill-card";
 import { Droppable } from "./droppable";
-import { CreateUserSkillDialog } from "./create-user-skill-dialog";
+import { UserSkillDialog } from "./user-skill-dialog";
 import { Skill, Skills, UserSkills } from "@/lib/types";
 import { toast } from "sonner";
 import { Proficiency } from "@/lib/types";
 import { useCreateUserSkill } from "@/hooks/users";
+import { LEVEL_TEXT_COLORS } from "@/lib/const";
 
 type KanbanColumnProps = {
   level: Proficiency;
   droppableId: string;
   userSkills: UserSkills;
-  textColor: string;
   availableSkills: Skills;
 };
 
-export default function KanbanColumn({
-  level,
-  droppableId,
-  userSkills,
-  textColor,
-  availableSkills,
-}: KanbanColumnProps) {
+export default function KanbanColumn({ level, droppableId, userSkills, availableSkills }: KanbanColumnProps) {
   const { mutateAsync: createUserSkill } = useCreateUserSkill();
   const [open, setOpen] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
@@ -61,9 +55,9 @@ export default function KanbanColumn({
 
   return (
     <Droppable id={droppableId} className="bg-muted rounded-xl p-4 shadow-sm mt-5">
-      <h2 className={`text-xl font-semibold mb-4 flex items-center justify-between ${textColor}`}>
+      <h2 className={`text-xl font-semibold mb-4 flex items-center justify-between ${LEVEL_TEXT_COLORS[level]}`}>
         {level}
-        <CreateUserSkillDialog
+        <UserSkillDialog
           onSubmit={handleCreateUserSkill}
           selectedSkill={selectedSkill}
           setSelectedSkill={setSelectedSkill}

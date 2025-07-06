@@ -1,4 +1,5 @@
 import { Journal, journalSchema } from "@/lib/types";
+import { z } from "zod";
 
 export async function fetchJournalById(id: number): Promise<Journal | undefined> {
   try {
@@ -73,6 +74,29 @@ export async function deleteJournalById(id: number): Promise<number | undefined>
     return id;
   } catch (error) {
     console.error(`Failed to delete journal by id: ${id}`, error);
+    throw new Error();
+  }
+}
+
+export async function generateJournalSummary(textContent: string): Promise<string> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/generate-summary/`, {
+      method: "POST",
+      body: JSON.stringify({ textContent }),
+      headers: {
+        "Content-type": "application/json",
+      },
+    });
+    const resJSON = await res.json();
+    if (!res.ok) {
+      throw new Error(JSON.stringify(resJSON));
+    }
+    const summary = resJSON.summary;
+    console.log(resJSON);
+    const validatedSummary = z.string().parse(summary);
+    return validatedSummary;
+  } catch (error) {
+    console.error(`Failed to generate journal summary`, error);
     throw new Error();
   }
 }

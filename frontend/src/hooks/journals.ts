@@ -1,5 +1,11 @@
 import { useQuery, UseQueryResult, UseMutationResult, useMutation } from "@tanstack/react-query";
-import { createJournal, deleteJournalById, fetchJournalById, updateJournalById } from "@/api/journals";
+import {
+  createJournal,
+  deleteJournalById,
+  fetchJournalById,
+  generateJournalSummary,
+  updateJournalById,
+} from "@/api/journals";
 import { Journal, UserSkill } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -59,5 +65,11 @@ export function useDeleteJournalById(userSkillId: number): UseMutationResult<num
         });
       }
     },
+  });
+}
+
+export function useGenerateJournalSummary(): UseMutationResult<string, Error, string> {
+  return useMutation({
+    mutationFn: generateJournalSummary,
   });
 }

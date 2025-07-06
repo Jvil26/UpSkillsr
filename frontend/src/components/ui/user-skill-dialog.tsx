@@ -15,7 +15,7 @@ import { ProficiencySelect } from "./proficiency-select";
 import { Skill, Proficiency, Skills } from "@/lib/types";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
-type CreateUserSkillDialogProps = {
+type UserSkillDialogProps = {
   open: boolean;
   level: Proficiency;
   selectedSkill: Skill | null;
@@ -28,7 +28,7 @@ type CreateUserSkillDialogProps = {
   setProficiency: React.Dispatch<React.SetStateAction<Proficiency>>;
 };
 
-export function CreateUserSkillDialog({
+export function UserSkillDialog({
   open,
   level,
   selectedSkill,
@@ -39,7 +39,7 @@ export function CreateUserSkillDialog({
   setOpen,
   setSelectedSkill,
   setProficiency,
-}: CreateUserSkillDialogProps) {
+}: UserSkillDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
