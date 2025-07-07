@@ -38,9 +38,9 @@ export default function SignIn() {
         const session = await fetchAuthSession();
         console.log("Current User: ", currentUser);
         console.log("Tokens: ", session?.tokens);
-        const tokens = session?.tokens;
-        if (currentUser && tokens) {
-          login(currentUser, tokens);
+        if (currentUser && session?.tokens?.accessToken) {
+          const tokens = session.tokens;
+          login(currentUser);
           const userData = {
             username: tokens.idToken?.payload["cognito:username"] as string,
             email: tokens.idToken?.payload.email as string,
@@ -51,7 +51,6 @@ export default function SignIn() {
           const backendUser = await createFetchUser(userData);
           console.log(backendUser);
           localStorage.setItem("currentUser", JSON.stringify(currentUser));
-          localStorage.setItem("tokens", JSON.stringify(tokens));
           router.push("/");
         }
       }
@@ -89,7 +88,7 @@ export default function SignIn() {
   return (
     <div className="flex justify-evenly items-center min-h-screen overflow-y-auto sm:flex-row flex-col">
       {loading || loggedIn ? (
-        <Loader2 />
+        <Loader2 className="w-15 h-15 animate-spin" />
       ) : (
         <Button
           onClick={handleSignIn}

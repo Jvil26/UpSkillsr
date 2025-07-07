@@ -1,11 +1,10 @@
 "use client";
 import { createContext, useState, ReactNode, useContext } from "react";
-import { type AuthUser, type AuthTokens } from "aws-amplify/auth";
+import { type AuthUser } from "aws-amplify/auth";
 
 interface AuthContextType {
   user: AuthUser | null;
-  tokens: AuthTokens | null;
-  login: (userData: AuthUser | null, tokensData: AuthTokens | null) => void;
+  login: (userData: AuthUser | null) => void;
   logout: () => void;
   loggedIn: boolean;
   loading: boolean;
@@ -16,25 +15,22 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [tokens, setTokens] = useState<AuthTokens | null>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const login = (userData: AuthUser | null, tokensData: AuthTokens | null) => {
+  const login = (userData: AuthUser | null) => {
     setUser(userData);
-    setTokens(tokensData);
     setLoggedIn(true);
   };
 
   const logout = () => {
     localStorage.clear();
     setUser(null);
-    setTokens(null);
     setLoggedIn(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, tokens, login, logout, loggedIn, setLoading, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loggedIn, setLoading, loading }}>
       {children}
     </AuthContext.Provider>
   );

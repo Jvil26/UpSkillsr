@@ -1,9 +1,10 @@
 import { Journal, journalSchema } from "@/lib/types";
 import { z } from "zod";
+import { fetchWithAuth } from "@/lib/utils";
 
 export async function fetchJournalById(id: number): Promise<Journal | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/${id}/`);
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/`);
     const resJSON = await res.json();
 
     if (!res.ok) {
@@ -18,7 +19,7 @@ export async function fetchJournalById(id: number): Promise<Journal | undefined>
 
 export async function createJournal(journalData: FormData): Promise<Journal | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/`, {
       method: "POST",
       body: journalData,
     });
@@ -43,7 +44,7 @@ export async function updateJournalById({
   journalData: FormData;
 }): Promise<Journal | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/${id}/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/${id}/`, {
       method: "PUT",
       body: journalData,
     });
@@ -62,7 +63,7 @@ export async function updateJournalById({
 
 export async function deleteJournalById(id: number): Promise<number | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/${id}/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/${id}/`, {
       method: "DELETE",
     });
 
@@ -80,7 +81,7 @@ export async function deleteJournalById(id: number): Promise<number | undefined>
 
 export async function generateJournalSummary(textContent: string): Promise<string> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/generate-summary/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/generate-summary/`, {
       method: "POST",
       body: JSON.stringify({ textContent }),
       headers: {

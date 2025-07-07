@@ -9,6 +9,7 @@ import {
   userSkillSchema,
   CreateUserSkillPayload,
 } from "@/lib/types";
+import { fetchWithAuth } from "@/lib/utils";
 
 export async function createUser(userData: UserPayload): Promise<User | undefined> {
   try {
@@ -56,7 +57,7 @@ export async function updateUserProfileById(
 ): Promise<User | undefined> {
   try {
     console.log(userProfileData);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/profiles/${id}/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/profiles/${id}/`, {
       method: "PUT",
       body: JSON.stringify(userProfileData),
       headers: {
@@ -79,7 +80,7 @@ export async function updateUserProfileById(
 
 export async function fetchUserSkills(username: string): Promise<UserSkills | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${username}/skills/`);
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${username}/skills/`);
 
     const resJSON = await res.json();
     if (!res.ok) {
@@ -96,7 +97,7 @@ export async function fetchUserSkills(username: string): Promise<UserSkills | un
 
 export async function fetchUserSkillById(id: number): Promise<UserSkill | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}/`);
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}/`);
     const resJSON = await res.json();
     if (!res.ok) {
       throw new Error(JSON.stringify(resJSON));
@@ -112,7 +113,7 @@ export async function fetchUserSkillById(id: number): Promise<UserSkill | undefi
 
 export async function createUserSkills(userSkillsData: UserSkills): Promise<UserSkills | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/`, {
       method: "POST",
       body: JSON.stringify(userSkillsData),
       headers: {
@@ -135,7 +136,7 @@ export async function createUserSkills(userSkillsData: UserSkills): Promise<User
 
 export async function createUserSkill(userSkillData: CreateUserSkillPayload): Promise<UserSkill | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/`, {
       method: "POST",
       body: JSON.stringify(userSkillData),
       headers: {
@@ -158,7 +159,7 @@ export async function createUserSkill(userSkillData: CreateUserSkillPayload): Pr
 
 export async function updateUserSkillById(id: number, data: CreateUserSkillPayload): Promise<UserSkill | undefined> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
       headers: {
@@ -181,7 +182,7 @@ export async function updateUserSkillById(id: number, data: CreateUserSkillPaylo
 
 export async function deleteUserSkillById(id: number): Promise<number> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}/`, {
       method: "DELETE",
     });
     if (!res.ok) {
@@ -206,7 +207,7 @@ export async function updateUserProfilePic({
   try {
     const formData = new FormData();
     formData.append("profile_pic", file);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/profiles/${userProfileId}/`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/profiles/${userProfileId}/`, {
       method: "PATCH",
       body: formData,
     });

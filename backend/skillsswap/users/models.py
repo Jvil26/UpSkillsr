@@ -1,7 +1,7 @@
 from django.db import models
 from .storages import PublicMediaStorage
 from skills.models import Skill
-from journals.models import Journal
+
 
 # Create your models here.
 class User(models.Model):
@@ -13,16 +13,24 @@ class User(models.Model):
     def __str__(self):
         return f"Username: {self.username}, Name: {self.name}, email: {self.email}"
 
+    @property
+    def is_authenticated(self):
+        # Django expects this property on user objects
+        return True
+
+
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
-    profile_pic = models.ImageField(upload_to='profile_pics/', storage=PublicMediaStorage(), blank=True, null=True)
+    profile_pic = models.ImageField(
+        upload_to="profile_pics/", storage=PublicMediaStorage(), blank=True, null=True
+    )
     phone = models.CharField(max_length=30, blank=True)
     gender = models.CharField(max_length=25, blank=True)
 
     def __str__(self):
         return f"{User.username}'s profile, bio - {self.bio}, phone - {self.phone}"
-    
+
     def save(self, *args, **kwargs):
         try:
             old = UserProfile.objects.get(pk=self.pk)
@@ -32,20 +40,23 @@ class UserProfile(models.Model):
             pass
         super().save(*args, **kwargs)
 
+
 class UserSkill(models.Model):
     PROCIENCY_TYPES = [
-        ('Beginner', 'Beginner'),
-        ('Intermediate', 'Intermediate'),
-        ('Advanced', 'Advanced')
+        ("Beginner", "Beginner"),
+        ("Intermediate", "Intermediate"),
+        ("Advanced", "Advanced"),
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_skills')
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="user_skill_entries")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_skills")
+    skill = models.ForeignKey(
+        Skill, on_delete=models.CASCADE, related_name="user_skill_entries"
+    )
     proficiency = models.CharField(max_length=15, choices=PROCIENCY_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.skill.name}, {self.proficiency}"
-    
+
     class Meta:
-        unique_together = ('user', 'skill')
+        unique_together = ("user", "skill")

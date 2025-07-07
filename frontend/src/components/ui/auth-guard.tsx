@@ -11,19 +11,16 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const userStr = localStorage.getItem("currentUser");
-    const tokensStr = localStorage.getItem("tokens");
-    if (userStr && tokensStr) {
+    if (userStr) {
       const user = JSON.parse(userStr);
-      const tokens = JSON.parse(tokensStr);
-      login(user, tokens);
-      console.log(user, tokens);
+      login(user);
+      console.log(user);
     } else {
       setAuthChecked(true);
     }
   }, []);
 
   useEffect(() => {
-    console.log(loggedIn, authChecked, loading);
     if (authChecked && !loggedIn && !loading) {
       console.log("Not Logged In");
       router.push("/sign-in");
