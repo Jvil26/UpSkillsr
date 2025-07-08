@@ -78,7 +78,7 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 px-4 pb-10 pt-[calc(var(--nav-height))]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 px-4 pb-10 pt-[calc(var(--nav-height))] max-w-screen">
         {PROFIENCIES.map((level) => (
           <KanbanColumn
             key={`kanban-column-${level}`}

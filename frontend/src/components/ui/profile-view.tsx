@@ -72,7 +72,7 @@ export default function ProfileView() {
 
   return (
     <div className="flex justify-evenly items-center p-8 min-h-screen overflow-y-auto sm:flex-row flex-col pt-[calc(var(--nav-height))]">
-      <div className="flex flex-col justify-center items-center gap-y-5 mb-5">
+      <div className="flex flex-col justify-center items-center gap-y-5 mb-5 w-full">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">{user?.username}</h1>
         <Label htmlFor="avatar" className="cursor-pointer justify-center flex-col items-center mb-5">
           <Avatar className="w-6/10 h-6/10 mt-2 hover:opacity-50">
@@ -96,9 +96,9 @@ export default function ProfileView() {
         </h3>
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Gender: {user?.profile.gender}</h3>
       </div>
-      <div className="space-y-8 w-100">
+      <div className="space-y-8 w-9/10">
         <div className="grid w-full gap-1">
-          <Label htmlFor="bio" className="font-semibold text-base">
+          <Label htmlFor="bio" className="font-semibold text-[1.1rem]">
             Bio
           </Label>
           <Textarea
@@ -106,7 +106,7 @@ export default function ProfileView() {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             id="bio"
-            className="h-30"
+            className="min-h-45 resize-none h-fit !text-[1rem]"
           />
           <p className="text-muted-foreground text-sm">Your bio helps you find better matches.</p>
         </div>

@@ -8,7 +8,8 @@ export function Droppable(props: { id: string; children: React.ReactNode; classN
   });
   const style: React.CSSProperties = {
     transform: isOver ? "scale(1.02)" : "scale(1)",
-    height: isOver ? "calc(100% + 180px)" : "100%",
+    height: "fit-content",
+    paddingBottom: isOver ? "200px" : "",
   };
 
   return (

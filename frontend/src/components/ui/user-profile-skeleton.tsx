@@ -2,7 +2,7 @@ import { Skeleton } from "./skeleton";
 
 export function UserProfileSkeleton() {
   return (
-    <>
+    <div className="flex justify-evenly items-center p-8 min-h-screen overflow-y-auto sm:flex-row flex-col pt-[calc(var(--nav-height))]">
       <div className="flex flex-col justify-center items-center gap-y-5">
         {/* User Info */}
         <Skeleton className="h-12 w-60 rounded-md" /> {/* Username */}
@@ -28,6 +28,6 @@ export function UserProfileSkeleton() {
         {/* Button */}
         <Skeleton className="h-10 w-32 rounded-md" />
       </div>
-    </>
+    </div>
   );
 }

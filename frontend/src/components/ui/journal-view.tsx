@@ -58,7 +58,7 @@ export default function JournalView({
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
             placeholder="Type your journal content here"
-            className="!text-[1rem] min-h-40 resize-none h-fit"
+            className="!text-[1rem] min-h-50 resize-none h-fit"
           />
         </div>
 
@@ -81,7 +81,7 @@ export default function JournalView({
             rows={4}
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
-            className="!text-[1rem] min-h-15 h-fit mt-2 resize-none"
+            className="!text-[1rem] min-h-40 h-fit mt-2 resize-none"
             placeholder="AI-generated summary will appear here"
           />
         </div>

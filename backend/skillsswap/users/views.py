@@ -17,6 +17,7 @@ from users.serializers import UserSerializer, UserProfileSerializer, UserSkillSe
 
 # Create your views here.
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def user_list(request):
     """
     List all users, or create a new user.
@@ -24,16 +25,11 @@ def user_list(request):
 
     if request.method == "GET":
         permission = IsAuthenticated()
-    else:  # POST
-        permission = AllowAny()
-
-    if not permission.has_permission(request, view=None):
-        return Response(
-            {"detail": "Authentication credentials were not provided."},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
-    if request.method == "GET":
+        if not permission.has_permission(request, view=None):
+            return Response(
+                {"detail": "Authentication required"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
