@@ -26,13 +26,7 @@ def journals_list(request):
         return Response(serializer.data)
 
     elif request.method == "POST":
-        data = request.data.copy()
-        if "prompts" in data:
-            try:
-                data["prompts"] = json.loads(data["prompts"])
-            except json.JSONDecodeError:
-                data["prompts"] = []
-        serializer = JournalSerializer(data=data)
+        serializer = JournalSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
