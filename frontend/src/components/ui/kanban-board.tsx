@@ -12,7 +12,8 @@ import {
   PointerSensor,
   useSensor,
 } from "@dnd-kit/core";
-import { UserSkills, Proficiency, UserSkill, Skills } from "@/lib/types";
+import { UserSkills, Proficiency, UserSkill, Skills, UserSkillPayload } from "@/lib/types";
+import { useUpdateUserSkillById } from "@/hooks/users";
 
 type KanbanBoardProps = {
   userSkills: UserSkills;
@@ -20,6 +21,7 @@ type KanbanBoardProps = {
 };
 
 export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoardProps) {
+  const { mutateAsync: updateUserSkillbyId } = useUpdateUserSkillById();
   const [usrSkills, setUserSkills] = useState<UserSkills>(userSkills);
   const [draggedWidth, setDraggedWidth] = useState<number | undefined>(undefined);
   const [activeSkill, setActiveSkill] = useState<UserSkill | null>(null);
@@ -32,18 +34,26 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
     })
   );
 
-  const handleDragEnd = (e: DragEndEvent) => {
+  const handleDragEnd = async (e: DragEndEvent) => {
     const { active, over } = e;
     if (over && over.id) {
+      let newUserSkillData: UserSkillPayload | null = null;
       const newUserSkills = userSkills.map((us) => {
-        if (us.id === active.id) {
-          if (us.proficiency !== over?.id) {
-            us.proficiency = over.id as Proficiency;
-          }
+        if (us.id === active.id && us.proficiency !== over?.id) {
+          us.proficiency = over.id as Proficiency;
+          newUserSkillData = {
+            user_id: us.user,
+            skill_id: us.skill.id,
+            proficiency: us.proficiency,
+          };
         }
         return us;
       });
-      setUserSkills(newUserSkills);
+
+      if (newUserSkillData) {
+        setUserSkills(newUserSkills);
+        await updateUserSkillbyId({ id: Number(active.id), data: newUserSkillData });
+      }
     }
     setActiveSkill(null);
     setDraggedWidth(undefined);

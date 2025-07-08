@@ -14,7 +14,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (userStr) {
       const user = JSON.parse(userStr);
       login(user);
-      console.log(user);
     } else {
       setAuthChecked(true);
     }

@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { tokenStore } from "./tokenStore";
 import { fetchAuthSession } from "aws-amplify/auth";
 
 export function cn(...inputs: ClassValue[]) {

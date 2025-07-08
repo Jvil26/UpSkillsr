@@ -81,10 +81,6 @@ export default function SignIn() {
     }
   }, [isError]);
 
-  useEffect(() => {
-    console.log("LoggedIn: ", loggedIn, "Loading: ", loading);
-  }, []);
-
   return (
     <div className="flex justify-evenly items-center min-h-screen overflow-y-auto sm:flex-row flex-col">
       {loading || loggedIn ? (

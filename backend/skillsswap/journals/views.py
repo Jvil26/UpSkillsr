@@ -7,6 +7,7 @@ from journals.models import Journal
 from journals.serializers import JournalSerializer
 import anthropic
 import tiktoken
+import json
 
 client = anthropic.Anthropic()
 encoding = tiktoken.get_encoding("cl100k_base")
@@ -25,7 +26,13 @@ def journals_list(request):
         return Response(serializer.data)
 
     elif request.method == "POST":
-        serializer = JournalSerializer(data=request.data)
+        data = request.data.copy()
+        if "prompts" in data:
+            try:
+                data["prompts"] = json.loads(data["prompts"])
+            except json.JSONDecodeError:
+                data["prompts"] = []
+        serializer = JournalSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -79,7 +86,7 @@ def journals_by_user_skill(request, user_skill_id):
 @api_view(["POST"])
 def generate_journal_summary(request):
     """
-    Generate CHATGPT summary of journal text_content
+    Generate Claude AI summary of journal text_content
     """
     try:
         text_content = request.data.get("textContent")
@@ -93,7 +100,7 @@ def generate_journal_summary(request):
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": build_llm_prompt(text_content)}
+                        {"type": "text", "text": build_llm_summary_prompt(text_content)}
                     ],
                 }
             ],
@@ -105,21 +112,99 @@ def generate_journal_summary(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def build_llm_prompt(text_content):
+@api_view(["POST"])
+def generate_journal(request):
+    """
+    Generate Journal with Claude AI
+    """
+    try:
+        prompts = request.data.get("prompts")
+        message = client.messages.create(
+            model="claude-3-5-haiku-20241022",
+            max_tokens=3000,
+            temperature=0.7,
+            system="You are a helpful assistant that writes reflective journal entries for skill development. Given the user's answers to some journaling questions, generate a detailed and thoughtful journal entry.",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": build_llm_journal_prompt(prompts)}
+                    ],
+                }
+            ],
+        )
+
+        journal_json = json.loads(message.content[0].text)
+        print(journal_json)
+        if journal_json and all(
+            journal_json.get(field) is not None
+            for field in ["title", "text_content", "youtube_url", "summary"]
+        ):
+            # data = {
+            #     "user_skill": request.data.get("userSkillId"),
+            #     "title": journal_json["title"],
+            #     "text_content": journal_json["text_content"],
+            #     "youtube_url": journal_json["youtube_url"],
+            #     "ai_summary": journal_json.get("summary"),
+            #     "prompts": prompts,
+            # }
+            # serializer = JournalSerializer(data=data)
+            # if serializer.is_valid():
+            #     return Response(serializer.data, status=status.HTTP_200_OK)
+            # else:
+            #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(journal_json, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "Bad request"}, status=status.HTTP_400_BAD_REQUEST
+            )
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def build_llm_journal_prompt(prompts):
+    users_responses = []
+    for i, prompt in enumerate(prompts):
+        users_responses.append(
+            f"{(i+1)}. {prompt["question"]}\nAnswer: {prompt["answer"]}"
+        )
+
+    return f"""
+        Use the answers to write:
+        - A concise, descriptive title (limit to 50 characters)
+        - A detailed journal entry in natural language that sounds reflective and personal
+        - (Optional) If relevant, suggest a YouTube URL that could help reinforce the learning
+        - A brief summary capturing the key insights of the journal entry
+
+        Respond with **only** valid JSON (no markdown, no explanation), and make sure all newline characters inside strings are properly escaped with \\n.
+
+        Format the response in JSON with the following fields:
+        {{
+        "title": string,
+        "text_content": string,
+        "youtube_url": string (or null if not applicable)
+        "summary": string
+        }}
+
+        User's responses: {("\n\n").join(users_responses)}
+        """
+
+
+def build_llm_summary_prompt(text_content):
     return f"""
     Journal Entry:
     \"\"\"
     {text_content}
     \"\"\"
 
-Summarize the journal entry using the following sections — include only the relevant ones:
+    Summarize the journal entry using the following sections — include only the relevant ones:
 
-1. **Key Learnings** — What important concepts or takeaways did the user understand?
-2. **Misunderstandings & Clarifications** — Only include this if the user had incorrect assumptions or confusion that got resolved.
-3. **Implementation Notes** — Briefly describe how the user approached the task, including techniques or tools used — only if they are important to the learning.
+    1. **Key Learnings** — What important concepts or takeaways did the user understand?
+    2. **Misunderstandings & Clarifications** — Only include this if the user had incorrect assumptions or confusion that got resolved.
+    3. **Implementation Notes** — Briefly describe how the user approached the task, including techniques or tools used — only if they are important to the learning.
 
-Do not include any other sections or interpretations. Only return the relevant sections, in this order, with the section titles exactly as written.
-"""
+    Do not include any other sections or interpretations. Only return the relevant sections, in this order, with the section titles exactly as written.
+    """
 
 
 def truncate_prompt_text_input(text_content):

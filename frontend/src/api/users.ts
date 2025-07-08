@@ -7,7 +7,7 @@ import {
   userSkillsSchema,
   UserSkill,
   userSkillSchema,
-  CreateUserSkillPayload,
+  UserSkillPayload,
 } from "@/lib/types";
 import { fetchWithAuth } from "@/lib/utils";
 
@@ -134,7 +134,7 @@ export async function createUserSkills(userSkillsData: UserSkills): Promise<User
   }
 }
 
-export async function createUserSkill(userSkillData: CreateUserSkillPayload): Promise<UserSkill | undefined> {
+export async function createUserSkill(userSkillData: UserSkillPayload): Promise<UserSkill | undefined> {
   try {
     const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/`, {
       method: "POST",
@@ -157,9 +157,9 @@ export async function createUserSkill(userSkillData: CreateUserSkillPayload): Pr
   }
 }
 
-export async function updateUserSkillById(id: number, data: CreateUserSkillPayload): Promise<UserSkill | undefined> {
+export async function updateUserSkillById(id: number, data: UserSkillPayload): Promise<UserSkill | undefined> {
   try {
-    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}`, {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/skills/${id}/`, {
       method: "PUT",
       body: JSON.stringify(data),
       headers: {

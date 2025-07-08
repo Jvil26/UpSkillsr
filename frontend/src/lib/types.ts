@@ -10,21 +10,16 @@ export type UserPayload = {
 
 export type Proficiency = "Beginner" | "Intermediate" | "Advanced";
 
-export type UserSkillsPayload = {
-  skill: Skill;
-  proficiency: Proficiency;
-}[];
-
-export type UpdateUserSkillPayload = {
-  id: number;
-  userSkills: UserSkillsPayload;
-};
-
-export type CreateUserSkillPayload = {
+export type UserSkillPayload = {
   user_id: number;
   skill_id: number;
   proficiency: Proficiency;
 };
+
+export type Prompts = {
+  question: string;
+  answer: string;
+}[];
 
 export const skillSchema = z.object({
   id: z.number(),
@@ -40,7 +35,14 @@ export const journalSchema = z.object({
   text_content: z.string(),
   media: z.string().nullable(),
   youtube_url: z.string().nullable(),
-  ai_summary: z.string().nullable(),
+  summary: z.string().nullable(),
+  prompts: z.array(
+    z.object({
+      question: z.string(),
+      answer: z.string(),
+    })
+  ),
+  updated_at: z.string(),
   created_at: z.string(),
 });
 

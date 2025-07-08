@@ -12,7 +12,7 @@ import {
   deleteUserSkillById,
 } from "@/api/users";
 import { UseQueryResult, UseMutationResult } from "@tanstack/react-query";
-import { User, UserPayload, UserProfile, UserSkills, UserSkill, CreateUserSkillPayload } from "@/lib/types";
+import { User, UserPayload, UserProfile, UserSkills, UserSkill, UserSkillPayload } from "@/lib/types";
 import { useAuthContext } from "@/context/auth";
 
 export function useCreateOrFetchUser(): UseMutationResult<User | undefined, Error, UserPayload> {
@@ -87,7 +87,7 @@ export function useCreateUserSkills(): UseMutationResult<UserSkills | undefined,
   });
 }
 
-export function useCreateUserSkill(): UseMutationResult<UserSkill | undefined, Error, CreateUserSkillPayload> {
+export function useCreateUserSkill(): UseMutationResult<UserSkill | undefined, Error, UserSkillPayload> {
   const queryClient = useQueryClient();
   const { user } = useAuthContext();
   const username = user?.username;
@@ -108,7 +108,7 @@ export function useCreateUserSkill(): UseMutationResult<UserSkill | undefined, E
 export function useUpdateUserSkillById(): UseMutationResult<
   UserSkill | undefined,
   Error,
-  { id: number; data: CreateUserSkillPayload }
+  { id: number; data: UserSkillPayload }
 > {
   const { user } = useAuthContext();
   const username = user?.username;

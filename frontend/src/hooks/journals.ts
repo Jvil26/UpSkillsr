@@ -3,22 +3,23 @@ import {
   createJournal,
   deleteJournalById,
   fetchJournalById,
+  generateJournal,
   generateJournalSummary,
   updateJournalById,
 } from "@/api/journals";
-import { Journal, UserSkill } from "@/lib/types";
+import { Journal, Prompts, UserSkill } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function useFetchJournalById(id: number, options?: { enabled?: boolean }): UseQueryResult<Journal | undefined> {
   return useQuery({
     queryKey: options?.enabled ? ["journal", id] : ["journal"],
     queryFn: () => fetchJournalById(id!),
-    enabled: options?.enabled ?? true,
+    enabled: options?.enabled ?? false,
     staleTime: 1000 * 60 * 5,
   });
 }
 
-export function useCreateJournal(userSkillId: number): UseMutationResult<Journal | undefined, Error, FormData> {
+export function useCreateJournal(): UseMutationResult<Journal | undefined, Error, FormData> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -26,15 +27,23 @@ export function useCreateJournal(userSkillId: number): UseMutationResult<Journal
     onSuccess: (newJournal) => {
       if (newJournal) {
         queryClient.setQueryData(["journal", newJournal.id], newJournal);
-        queryClient.invalidateQueries({ queryKey: ["userSkill", userSkillId] });
+        queryClient.setQueryData(["userSkill", newJournal.user_skill], (oldData: UserSkill) => {
+          if (!oldData) return [newJournal];
+          return {
+            ...oldData,
+            journals: [...oldData.journals, newJournal],
+          };
+        });
       }
     },
   });
 }
 
-export function useUpdateJournalById(
-  userSkillId: number
-): UseMutationResult<Journal | undefined, Error, { id: number; journalData: FormData }> {
+export function useUpdateJournalById(): UseMutationResult<
+  Journal | undefined,
+  Error,
+  { id: number; journalData: FormData }
+> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -42,7 +51,14 @@ export function useUpdateJournalById(
     onSuccess: (updatedJournal) => {
       if (updatedJournal) {
         queryClient.setQueryData(["journal", updatedJournal.id], updatedJournal);
-        queryClient.invalidateQueries({ queryKey: ["userSkill", userSkillId] });
+        queryClient.setQueryData(["userSkill", updatedJournal.user_skill], (oldData: UserSkill) => {
+          if (!oldData) return oldData;
+          const updatedJournals = oldData.journals.map((j) => (updatedJournal.id === j.id ? updatedJournal : j));
+          return {
+            ...oldData,
+            journals: updatedJournals,
+          };
+        });
       }
     },
   });
@@ -71,5 +87,15 @@ export function useDeleteJournalById(userSkillId: number): UseMutationResult<num
 export function useGenerateJournalSummary(): UseMutationResult<string, Error, string> {
   return useMutation({
     mutationFn: generateJournalSummary,
+  });
+}
+
+export function useGenerateJournal(): UseMutationResult<
+  Partial<Journal>,
+  Error,
+  { prompts: Prompts; userSkillId: number }
+> {
+  return useMutation({
+    mutationFn: ({ userSkillId, prompts }) => generateJournal(userSkillId, prompts),
   });
 }

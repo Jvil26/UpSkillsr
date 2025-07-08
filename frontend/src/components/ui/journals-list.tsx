@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useFetchUserSkillById } from "@/hooks/users";
 import { useDeleteJournalById } from "@/hooks/journals";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusCircle } from "lucide-react";
 
 type JournalsListProps = {
   userSkillId: number;
@@ -20,13 +20,11 @@ export default function JournalsList({ userSkillId }: JournalsListProps) {
 
   const handleDelete = (id: number) => {
     // implement delete logic here
-    console.log("Delete journal", id);
     deleteJournalById(id);
   };
 
   const handleView = (journalId: number) => {
     // e.g., open a modal or route to full view
-    console.log("View journal", journalId);
     router.push(`${pathName}/${journalId}`);
   };
 
@@ -51,9 +49,9 @@ export default function JournalsList({ userSkillId }: JournalsListProps) {
                   value={`journal-${journal.id}`}
                   className="border rounded-xl bg-card p-4 shadow-sm"
                 >
-                  <AccordionTrigger className="justify-between items-center cursor-pointer hover:no-underline">
+                  <AccordionTrigger className="flex-col sm:flex-row justify-between items-center cursor-pointer hover:no-underline">
                     <span className="text-left text-xl font-bold">{journal.title}</span>
-                    <span className="text-right text-sm font-bold ml-auto">
+                    <span className="text-sm font-bold sm:ml-auto">
                       Created: {new Date(journal.created_at).toLocaleString()}
                     </span>
                   </AccordionTrigger>
@@ -71,10 +69,12 @@ export default function JournalsList({ userSkillId }: JournalsListProps) {
                 </AccordionItem>
               ))}
             <Link
-              className="flex justify-center items-center bg-green-700 hover:bg-green-800 text-[1.2rem] py-6 px-2 text-white rounded text-center font-bold h-10"
+              className="flex justify-center items-center bg-white hover:bg-gray-300 text-black text-[1.2rem] py-6 px-2 rounded text-center font-semibold h-10"
               href={`${pathName}/new`}
             >
-              <span>Create Journal</span>
+              <div className="flex justify-center items-center gap-x-3">
+                <PlusCircle /> Create Journal (AI Powered)
+              </div>
             </Link>
           </Accordion>
         </>

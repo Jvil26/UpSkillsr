@@ -12,8 +12,10 @@ class Journal(models.Model):
     media = models.FileField(
         upload_to="journal_medias/", storage=PublicMediaStorage(), blank=True, null=True
     )
+    prompts = models.JSONField(default=list)
     youtube_url = models.CharField(max_length=255, blank=True, null=True)
-    ai_summary = models.TextField(blank=True, null=True)
+    summary = models.TextField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
