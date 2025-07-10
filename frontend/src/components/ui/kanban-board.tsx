@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { UserSkills, Proficiency, UserSkill, Skills, UserSkillPayload } from "@/lib/types";
 import { useUpdateUserSkillById } from "@/hooks/users";
+import { useAuthContext } from "@/context/auth";
 
 type KanbanBoardProps = {
   userSkills: UserSkills;
@@ -25,6 +26,7 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
   const [usrSkills, setUserSkills] = useState<UserSkills>(userSkills);
   const [draggedWidth, setDraggedWidth] = useState<number | undefined>(undefined);
   const [activeSkill, setActiveSkill] = useState<UserSkill | null>(null);
+  const { user } = useAuthContext();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -36,13 +38,13 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
 
   const handleDragEnd = async (e: DragEndEvent) => {
     const { active, over } = e;
-    if (over && over.id) {
+    if (over && over.id && user?.username) {
       let newUserSkillData: UserSkillPayload | null = null;
       const newUserSkills = userSkills.map((us) => {
         if (us.id === active.id && us.proficiency !== over?.id) {
           us.proficiency = over.id as Proficiency;
           newUserSkillData = {
-            user_id: us.user,
+            user_id: user?.username,
             skill_id: us.skill.id,
             proficiency: us.proficiency,
           };
@@ -72,7 +74,6 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
   useEffect(() => {
     if (userSkills) {
       setUserSkills(userSkills);
-      console.log(userSkills);
     }
   }, [userSkills]);
 
@@ -94,6 +95,7 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
           <SkillCard
             id={activeSkill.id}
             skillName={activeSkill.skill.name}
+            category={activeSkill.skill.category}
             proficiency={activeSkill.proficiency}
             created_at={activeSkill.created_at}
             width={draggedWidth}

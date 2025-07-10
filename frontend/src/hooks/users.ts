@@ -78,7 +78,7 @@ export function useCreateUserSkills(): UseMutationResult<UserSkills | undefined,
     mutationFn: createUserSkills,
     onSuccess: (newSkills) => {
       if (username && newSkills) {
-        queryClient.setQueryData(["userSkills", username], (oldUserSkills: UserSkills) => {
+        queryClient.setQueryData(["userSkills", username], (oldUserSkills: UserSkills | undefined) => {
           if (!oldUserSkills) return newSkills;
           return [...oldUserSkills, ...newSkills];
         });
@@ -96,7 +96,7 @@ export function useCreateUserSkill(): UseMutationResult<UserSkill | undefined, E
     mutationFn: createUserSkill,
     onSuccess: (newSkill) => {
       if (username && newSkill) {
-        queryClient.setQueryData(["userSkills", username], (oldUserSkills: UserSkills) => {
+        queryClient.setQueryData(["userSkills", username], (oldUserSkills: UserSkills | undefined) => {
           if (!oldUserSkills) return [newSkill];
           return [...oldUserSkills, newSkill];
         });

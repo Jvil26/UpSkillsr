@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Draggable } from "./draggable";
-import { LEVEL_BG_COLORS } from "@/lib/const";
+import { CATEGORY_BG_COLORS, LEVEL_BG_COLORS } from "@/lib/const";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -17,12 +17,13 @@ import { useUpdateUserSkillById, useDeleteUserSkillById } from "@/hooks/users";
 type SkillCardProps = {
   id: number;
   skillName: string;
+  category: string;
   proficiency: string;
   created_at: string;
   width?: number | undefined;
 };
 
-export function SkillCard({ id, skillName, proficiency, created_at, width }: SkillCardProps) {
+export function SkillCard({ id, skillName, category, proficiency, created_at, width }: SkillCardProps) {
   const { mutate: deleteUserSkillById } = useDeleteUserSkillById();
   const { mutate: updateUserSkillById } = useUpdateUserSkillById();
   const router = useRouter();
@@ -41,7 +42,7 @@ export function SkillCard({ id, skillName, proficiency, created_at, width }: Ski
       <Card
         key={id}
         id={`skill-card-${id.toString()}`}
-        className="border border-border cursor-pointer py-3"
+        className="border border-border cursor-pointer pt-3 pb-1"
         onClick={() => router.push(`/skills/${id}/journals`)}
       >
         <CardHeader className="flex items-start justify-between pr-1 pl-4">
@@ -66,11 +67,16 @@ export function SkillCard({ id, skillName, proficiency, created_at, width }: Ski
             </DropdownMenuContent>
           </DropdownMenu>
         </CardHeader>
-        <CardContent className="flex justify-between items-center pt-4 px-4 pb-1 mt-8">
+        <CardContent className="flex justify-between items-center pb-1 mt-15 px-3">
           <div className="text-sm text-muted-foreground">Created: {new Date(created_at).toLocaleDateString()}</div>
-          <Badge variant="outline" className={`${LEVEL_BG_COLORS[proficiency]}`}>
-            {proficiency}
-          </Badge>
+          <div className="flex gap-x-2">
+            <Badge variant="outline" className={`${CATEGORY_BG_COLORS[category]}`}>
+              {category}
+            </Badge>
+            <Badge variant="outline" className={`${LEVEL_BG_COLORS[proficiency]}`}>
+              {proficiency}
+            </Badge>
+          </div>
         </CardContent>
       </Card>
     </Draggable>

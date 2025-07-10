@@ -6,6 +6,9 @@ import Link from "next/link";
 import { useFetchUserSkillById } from "@/hooks/users";
 import { useDeleteJournalById } from "@/hooks/journals";
 import { Loader2, PlusCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CATEGORY_BG_COLORS, LEVEL_BG_COLORS, VIEW_MODES } from "@/lib/const";
+import { ViewMode } from "@/lib/types";
 
 type JournalsListProps = {
   userSkillId: number;
@@ -19,13 +22,11 @@ export default function JournalsList({ userSkillId }: JournalsListProps) {
   const pathName = usePathname();
 
   const handleDelete = (id: number) => {
-    // implement delete logic here
     deleteJournalById(id);
   };
 
-  const handleView = (journalId: number) => {
-    // e.g., open a modal or route to full view
-    router.push(`${pathName}/${journalId}`);
+  const handleView = (journalId: number, view: ViewMode) => {
+    router.push(`${pathName}/${journalId}?viewMode=${encodeURIComponent(view)}`);
   };
 
   return (
@@ -36,9 +37,27 @@ export default function JournalsList({ userSkillId }: JournalsListProps) {
         </div>
       ) : (
         <>
-          <h1 className="text-[3rem] mt-5 font-bold text-center underline underline-offset-12">
-            {userSkill?.skill.name} Journals
-          </h1>
+          <div className="relative flex flex-col lg:flex-row justify-center items-center mt-5">
+            <h1 className="text-[3rem] font-bold text-center underline underline-offset-12">
+              {userSkill?.skill.name} Journals
+            </h1>
+            <div className="static lg:absolute lg:right-10 flex gap-x-2 mt-3">
+              <Badge
+                variant="outline"
+                className={`${
+                  userSkill && CATEGORY_BG_COLORS[userSkill?.skill.category]
+                } w-30 h-10 text-[1rem] rounded-full`}
+              >
+                {userSkill?.skill.category}
+              </Badge>
+              <Badge
+                variant="outline"
+                className={`${userSkill && LEVEL_BG_COLORS[userSkill?.proficiency]} w-30 h-10 text-[1rem] rounded-full`}
+              >
+                {userSkill?.proficiency}
+              </Badge>
+            </div>
+          </div>
           <Accordion type="multiple" className="bg-muted p-10 flex flex-col gap-8">
             {userSkill?.journals
               .slice()
@@ -58,8 +77,11 @@ export default function JournalsList({ userSkillId }: JournalsListProps) {
                   <AccordionContent className="flex flex-col gap-5 pb-2">
                     <p className="text-sm">{journal.text_content.slice(0, 200)}...</p>
                     <div className="flex gap-2 mt-2">
-                      <Button variant="outline" onClick={() => handleView(journal.id)}>
+                      <Button variant="outline" onClick={() => handleView(journal.id, VIEW_MODES.PREVIEW)}>
                         View
+                      </Button>
+                      <Button variant="outline" onClick={() => handleView(journal.id, VIEW_MODES.EDIT)}>
+                        Edit
                       </Button>
                       <Button variant="destructive" onClick={() => handleDelete(journal.id)}>
                         Delete
@@ -73,7 +95,7 @@ export default function JournalsList({ userSkillId }: JournalsListProps) {
               href={`${pathName}/new`}
             >
               <div className="flex justify-center items-center gap-x-3">
-                <PlusCircle /> Create Journal (AI Powered)
+                <PlusCircle /> <span className="text-base sm:text-lg">Create Journal (AI Powered)</span>
               </div>
             </Link>
           </Accordion>

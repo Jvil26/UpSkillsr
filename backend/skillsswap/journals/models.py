@@ -13,7 +13,6 @@ class Journal(models.Model):
         upload_to="journal_medias/", storage=PublicMediaStorage(), blank=True, null=True
     )
     prompts = models.JSONField(default=list)
-    youtube_url = models.CharField(max_length=255, blank=True, null=True)
     summary = models.TextField(blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -23,3 +22,21 @@ class Journal(models.Model):
 
     class Meta:
         unique_together = ("user_skill", "title")
+
+
+class ResourceLink(models.Model):
+    journal = models.ForeignKey(
+        Journal, on_delete=models.CASCADE, related_name="resource_links"
+    )
+    title = models.CharField(max_length=100)
+    url = models.URLField()
+    type = models.CharField(
+        max_length=50,
+        choices=[("Article", "Article"), ("Video", "Video"), ("Book", "Book")],
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return (
+            f"Resource Link: Type - {self.type}, Title - {self.title}, URL - {self.url}"
+        )

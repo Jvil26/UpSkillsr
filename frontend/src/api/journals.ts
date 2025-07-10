@@ -1,4 +1,4 @@
-import { Journal, journalSchema, Prompts } from "@/lib/types";
+import { Journal, journalSchema, Prompts, resourceLinksSchema, ResourceLinks, ResourceLink } from "@/lib/types";
 import { z } from "zod";
 import { fetchWithAuth } from "@/lib/utils";
 
@@ -48,12 +48,14 @@ export async function updateJournalById({
       method: "PUT",
       body: journalData,
     });
-    const resJSON = await res.json();
 
+    const resJSON = await res.json();
     if (!res.ok) {
       throw new Error(JSON.stringify(resJSON));
     }
+
     const validatedJournalJSON = journalSchema.parse(resJSON);
+    console.log(validatedJournalJSON);
     return validatedJournalJSON;
   } catch (error) {
     console.error(`Failed to update journal by id: ${id}`, error);
@@ -121,6 +123,36 @@ export async function generateJournal(userSkillId: number, prompts: Prompts): Pr
     return validatedPartialJournal;
   } catch (error) {
     console.error("Failed to generate journal", error);
+    throw new Error();
+  }
+}
+
+export async function batchUpdateResourceLinks(
+  journalId: number,
+  resourceLinks: Partial<ResourceLink>[]
+): Promise<ResourceLinks> {
+  try {
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/${journalId}/resource-links/batch/`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ resourceLinks }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const resJSON = await res.json();
+    if (!res.ok) {
+      throw new Error(JSON.stringify(resJSON));
+    }
+
+    const validatedResourceLinks = resourceLinksSchema.parse(resJSON);
+    console.log("Updated Resource Links: ", validatedResourceLinks);
+    return validatedResourceLinks;
+  } catch (error) {
+    console.error("Failed to update resource links", error);
     throw new Error();
   }
 }

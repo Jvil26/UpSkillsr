@@ -1,5 +1,6 @@
 import { useQuery, UseQueryResult, UseMutationResult, useMutation } from "@tanstack/react-query";
 import {
+  batchUpdateResourceLinks,
   createJournal,
   deleteJournalById,
   fetchJournalById,
@@ -7,7 +8,7 @@ import {
   generateJournalSummary,
   updateJournalById,
 } from "@/api/journals";
-import { Journal, Prompts, UserSkill } from "@/lib/types";
+import { Journal, Prompts, ResourceLink, ResourceLinks, UserSkill } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function useFetchJournalById(id: number, options?: { enabled?: boolean }): UseQueryResult<Journal | undefined> {
@@ -27,8 +28,8 @@ export function useCreateJournal(): UseMutationResult<Journal | undefined, Error
     onSuccess: (newJournal) => {
       if (newJournal) {
         queryClient.setQueryData(["journal", newJournal.id], newJournal);
-        queryClient.setQueryData(["userSkill", newJournal.user_skill], (oldData: UserSkill) => {
-          if (!oldData) return [newJournal];
+        queryClient.setQueryData(["userSkill", newJournal.user_skill], (oldData: UserSkill | undefined) => {
+          if (!oldData) return oldData;
           return {
             ...oldData,
             journals: [...oldData.journals, newJournal],
@@ -51,7 +52,7 @@ export function useUpdateJournalById(): UseMutationResult<
     onSuccess: (updatedJournal) => {
       if (updatedJournal) {
         queryClient.setQueryData(["journal", updatedJournal.id], updatedJournal);
-        queryClient.setQueryData(["userSkill", updatedJournal.user_skill], (oldData: UserSkill) => {
+        queryClient.setQueryData(["userSkill", updatedJournal.user_skill], (oldData: UserSkill | undefined) => {
           if (!oldData) return oldData;
           const updatedJournals = oldData.journals.map((j) => (updatedJournal.id === j.id ? updatedJournal : j));
           return {
@@ -72,7 +73,7 @@ export function useDeleteJournalById(userSkillId: number): UseMutationResult<num
     onSuccess: (deletedId) => {
       if (deletedId) {
         queryClient.invalidateQueries({ queryKey: ["journal", deletedId] });
-        queryClient.setQueryData(["userSkill", userSkillId], (oldData: UserSkill) => {
+        queryClient.setQueryData(["userSkill", userSkillId], (oldData: UserSkill | undefined) => {
           if (!oldData) return oldData;
           return {
             ...oldData,
@@ -97,5 +98,27 @@ export function useGenerateJournal(): UseMutationResult<
 > {
   return useMutation({
     mutationFn: ({ userSkillId, prompts }) => generateJournal(userSkillId, prompts),
+  });
+}
+
+export function useBatchUpdateResourceLinks(): UseMutationResult<
+  ResourceLinks,
+  Error,
+  { journalId: number; resourceLinks: Partial<ResourceLink>[] }
+> {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ journalId, resourceLinks }) => batchUpdateResourceLinks(journalId, resourceLinks),
+    onSuccess: (updatedResourceLinks, variables) => {
+      const { journalId } = variables;
+      queryClient.setQueryData(["journal", journalId], (oldData: Journal | undefined) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          resource_links: updatedResourceLinks,
+        };
+      });
+    },
   });
 }

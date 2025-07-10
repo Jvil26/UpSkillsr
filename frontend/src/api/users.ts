@@ -56,7 +56,6 @@ export async function updateUserProfileById(
   userProfileData: Partial<UserProfile>
 ): Promise<User | undefined> {
   try {
-    console.log(userProfileData);
     const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/profiles/${id}/`, {
       method: "PUT",
       body: JSON.stringify(userProfileData),

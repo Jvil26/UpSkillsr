@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export type ViewMode = "Edit" | "Preview";
+
 export type UserPayload = {
   username: string;
   phone: string;
@@ -11,7 +13,7 @@ export type UserPayload = {
 export type Proficiency = "Beginner" | "Intermediate" | "Advanced";
 
 export type UserSkillPayload = {
-  user_id: number;
+  user_id: string;
   skill_id: number;
   proficiency: Proficiency;
 };
@@ -24,9 +26,21 @@ export type Prompts = {
 export const skillSchema = z.object({
   id: z.number(),
   name: z.string(),
+  category: z.string(),
 });
 
 export const skillsSchema = z.array(skillSchema);
+
+export const resourceLinkSchema = z.object({
+  id: z.number(),
+  journal: z.number(),
+  title: z.string(),
+  url: z.string(),
+  type: z.string(),
+  created_at: z.string(),
+});
+
+export const resourceLinksSchema = z.array(resourceLinkSchema);
 
 export const journalSchema = z.object({
   id: z.number(),
@@ -34,7 +48,6 @@ export const journalSchema = z.object({
   title: z.string(),
   text_content: z.string(),
   media: z.string().nullable(),
-  youtube_url: z.string().nullable(),
   summary: z.string().nullable(),
   prompts: z.array(
     z.object({
@@ -42,6 +55,7 @@ export const journalSchema = z.object({
       answer: z.string(),
     })
   ),
+  resource_links: resourceLinksSchema,
   updated_at: z.string(),
   created_at: z.string(),
 });
@@ -90,3 +104,5 @@ export type UserSkill = z.infer<typeof userSkillSchema>;
 export type Skill = z.infer<typeof skillSchema>;
 export type Journal = z.infer<typeof journalSchema>;
 export type Journals = z.infer<typeof journalsSchema>;
+export type ResourceLink = z.infer<typeof resourceLinkSchema>;
+export type ResourceLinks = z.infer<typeof resourceLinksSchema>;

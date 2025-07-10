@@ -12,28 +12,24 @@ import { UserProfileSkeleton } from "./user-profile-skeleton";
 
 export default function ProfileView() {
   const { data: user, isFetching: isFetchingUser, isError: isErrorUser } = useFetchUser();
-  const { mutateAsync: updateUserProfileById } = useUpdateUserProfileById();
+  const { mutateAsync: updateUserProfileById, isPending: isSavingProfile } = useUpdateUserProfileById();
   const { mutateAsync: updateUserProfilePic } = useUpdateUserProfilePic();
   //const [userSkills, setUserSkills] = useState<Skills>([]);
   const [bio, setBio] = useState<string>("");
-  const [isSaving, setIsSaving] = useState(false);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsSaving(true);
     try {
       const file = e.target.files?.[0];
       if (file && user) {
         await updateUserProfilePic({ file: file, userProfileId: user?.profile.id });
+        toast.success("Successfully updated profile picture!");
       }
     } catch {
       toast.error("Error uploading image. Try again.");
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const handleSaveProfile = async () => {
-    setIsSaving(true);
     try {
       if (user && user?.profile) {
         await updateUserProfileById({
@@ -46,11 +42,10 @@ export default function ProfileView() {
             bio: bio,
           },
         });
+        toast.success("Successfully saved profile!");
       }
     } catch {
       toast.error("Error saving profile. Try again.");
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -106,12 +101,12 @@ export default function ProfileView() {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             id="bio"
-            className="min-h-45 resize-none h-fit !text-[1rem]"
+            className="min-h-45 resize-none h-fit !text-[1rem] w-full md:w-8/10"
           />
           <p className="text-muted-foreground text-sm">Your bio helps you find better matches.</p>
         </div>
-        <Button onClick={() => handleSaveProfile()} disabled={isSaving}>
-          Save Profile
+        <Button onClick={() => handleSaveProfile()} disabled={isSavingProfile}>
+          {isSavingProfile ? "Saving Profile..." : "Save Profile"}
         </Button>
       </div>
     </div>

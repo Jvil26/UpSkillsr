@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Proficiency } from "@/lib/types";
 import { useCreateUserSkill } from "@/hooks/users";
 import { LEVEL_TEXT_COLORS } from "@/lib/const";
+import { useAuthContext } from "@/context/auth";
 
 type KanbanColumnProps = {
   level: Proficiency;
@@ -21,6 +22,7 @@ export default function KanbanColumn({ level, droppableId, userSkills, available
   const [open, setOpen] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [proficiency, setProficiency] = useState<Proficiency>(level);
+  const { user } = useAuthContext();
 
   const handleCreateUserSkill = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,12 +31,18 @@ export default function KanbanColumn({ level, droppableId, userSkills, available
         toast.error("Failed to create user skill. Please select a skill.");
         return;
       }
-      await createUserSkill({ user_id: userSkills[0].user, skill_id: selectedSkill.id, proficiency: proficiency });
-      setOpen(false);
-      setSelectedSkill(null);
-      setProficiency(level);
-      toast.success(`Successfully created: ${selectedSkill.name} ${proficiency}`);
-    } catch {
+
+      if (user?.username) {
+        await createUserSkill({ user_id: user.username, skill_id: selectedSkill.id, proficiency: proficiency });
+        setOpen(false);
+        setSelectedSkill(null);
+        setProficiency(level);
+        toast.success(`Successfully created: ${selectedSkill.name} ${proficiency}`);
+      } else {
+        toast.error("Could not find user.");
+      }
+    } catch (error) {
+      console.error("Failed to create user skill", error);
       toast.error("Failed to create user skill");
     }
   };
@@ -78,6 +86,7 @@ export default function KanbanColumn({ level, droppableId, userSkills, available
               key={us.id}
               id={us.id}
               skillName={us.skill.name}
+              category={us.skill.category}
               proficiency={us.proficiency}
               created_at={us.created_at}
             />

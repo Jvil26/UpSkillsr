@@ -3,15 +3,15 @@ from django.db.models import Prefetch
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from journals.models import Journal
-from journals.serializers import JournalSerializer
+from journals.models import Journal, ResourceLink
+from journals.serializers import JournalSerializer, ResourceLinkSerializer
 import anthropic
 import tiktoken
 import json
 
 client = anthropic.Anthropic()
 encoding = tiktoken.get_encoding("cl100k_base")
-MAX_INPUT_TOKEN_LEN = 1000
+MAX_INPUT_TOKEN_LEN = 2000
 
 
 # Create your views here.
@@ -57,6 +57,64 @@ def journals_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@api_view(["GET", "POST"])
+def resource_links_list(request):
+    if request.method == "GET":
+        serializer = ResourceLinkSerializer(request.data)
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        serializer = ResourceLinkSerializer(request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "PUT", "DELETE"])
+def resource_links_detail(request, pk):
+    resource_link = get_object_or_404(ResourceLink, pk=pk)
+
+    if request.method == "GET":
+        serializer = ResourceLinkSerializer(resource_link)
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        serializer = ResourceLinkSerializer(request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        resource_link.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["PUT"])
+def resource_links_batch(request, journalId):
+    journal = get_object_or_404(Journal, id=journalId)
+    journal_resource_links = journal.resource_links.all()
+    resource_links_data = request.data.get("resourceLinks")
+
+    existing_ids = {link.id for link in journal_resource_links}
+    incoming_ids = {link.get("id") for link in resource_links_data if link.get("id")}
+
+    # Delete removed resource links
+    ResourceLink.objects.filter(id__in=existing_ids - incoming_ids).delete()
+
+    # Update or Create resource links
+    for link_data in resource_links_data:
+        link_id = link_data.get("id")
+        if link_id and link_id in existing_ids:
+            ResourceLink.objects.filter(id=link_id).update(**link_data)
+        else:
+            ResourceLink.objects.create(journal=journal, **link_data)
+
+    serializer = ResourceLinkSerializer(journal.resource_links.all(), many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(["GET"])
 def journals_by_user(request, username):
     """
@@ -84,10 +142,12 @@ def generate_journal_summary(request):
     """
     try:
         text_content = request.data.get("textContent")
-        text_content = truncate_prompt_text_input(text_content)
+        tokens_len = token_count(text_content)
+        if tokens_len > MAX_INPUT_TOKEN_LEN:
+            return Response({"error": "Your prompt is too long. Please shorten your input and try again."}, status=status.HTTP_400_BAD_REQUEST)
         message = client.messages.create(
             model="claude-3-5-haiku-20241022",
-            max_tokens=300,
+            max_tokens=3000,
             temperature=0.7,
             system="You are an intelligent assistant that helps users summarize their personal learning journals.",
             messages=[
@@ -129,24 +189,10 @@ def generate_journal(request):
         )
 
         journal_json = json.loads(message.content[0].text)
-        print(journal_json)
         if journal_json and all(
             journal_json.get(field) is not None
             for field in ["title", "text_content", "youtube_url", "summary"]
         ):
-            # data = {
-            #     "user_skill": request.data.get("userSkillId"),
-            #     "title": journal_json["title"],
-            #     "text_content": journal_json["text_content"],
-            #     "youtube_url": journal_json["youtube_url"],
-            #     "ai_summary": journal_json.get("summary"),
-            #     "prompts": prompts,
-            # }
-            # serializer = JournalSerializer(data=data)
-            # if serializer.is_valid():
-            #     return Response(serializer.data, status=status.HTTP_200_OK)
-            # else:
-            #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response(journal_json, status=status.HTTP_200_OK)
         else:
             return Response(
@@ -201,10 +247,14 @@ def build_llm_summary_prompt(text_content):
     """
 
 
-def truncate_prompt_text_input(text_content):
-    truncated_text = text_content
-    tokens = encoding.encode(text_content)
-    if len(tokens) > MAX_INPUT_TOKEN_LEN:
-        tokens = tokens[:MAX_INPUT_TOKEN_LEN]
-        truncated_text = encoding.decode(tokens)
-    return truncated_text
+def token_count(input):
+    if isinstance(input, dict):
+        total_tokens = 0
+        for question, answer in input.items():
+            total_tokens += len(encoding.encode(question))
+        return total_tokens
+    else:
+        total_tokens = 
+
+    tokens = encoding.encode(input)
+    return len(tokens)

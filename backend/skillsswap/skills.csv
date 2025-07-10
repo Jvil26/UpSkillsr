@@ -1,0 +1,689 @@
+category,skill
+Tech,Python
+Tech,Django
+Tech,React
+Tech,TypeScript
+Tech,Node.js
+Tech,Docker
+Tech,Kubernetes
+Tech,AWS
+Tech,Git
+Tech,Machine Learning
+Tech,Java
+Tech,C++
+Tech,C#
+Tech,Go
+Tech,Ruby
+Tech,PHP
+Tech,Swift
+Tech,Scala
+Tech,Perl
+Tech,SQL
+Tech,NoSQL
+Tech,GraphQL
+Tech,REST API
+Tech,Microservices
+Tech,DevOps
+Tech,Jenkins
+Tech,CICD
+Tech,Terraform
+Tech,Ansible
+Tech,Bash Scripting
+Tech,PowerShell
+Tech,Cloud Architecture
+Tech,Azure
+Tech,Google Cloud Platform
+Tech,Elasticsearch
+Tech,Redis
+Tech,RabbitMQ
+Tech,MongoDB
+Tech,PostgreSQL
+Tech,Apache Kafka
+Tech,HTML5
+Tech,CSS3
+Tech,Webpack
+Tech,Babel
+Tech,Jest
+Tech,Cypress
+Tech,Flutter
+Tech,React Native
+Tech,Express.js
+Tech,Selenium
+Tech,SwiftUI
+Tech,Blender (3D Software)
+Tech,Rust
+Tech,Dart
+Tech,Hadoop
+Tech,Spark
+Tech,TensorFlow
+Tech,PyTorch
+Tech,OpenCV
+Tech,Caffe (Deep Learning)
+Tech,Tableau (Tech)
+Tech,Power BI (Tech)
+Tech,GitHub Actions
+Tech,CircleCI
+Tech,Prometheus (Monitoring)
+Tech,Grafana (Visualization)
+Tech,Nginx
+Tech,Apache HTTP Server
+Tech,Linux Administration
+Tech,VMware
+Tech,Hyper-V
+Tech,WebAssembly
+Tech,Blockchain Development
+Tech,Smart Contracts
+Tech,Cryptography
+Tech,Penetration Testing
+Tech,Network Security
+Tech,SSL/TLS
+Tech,OAuth
+Tech,SAML
+Tech,API Gateway
+Tech,Load Balancing
+Tech,Content Delivery Network (CDN)
+Tech,Serverless Architecture
+Tech,Edge Computing
+Tech,IoT Development
+Tech,Embedded Systems
+Tech,Game Development
+Languages,English
+Languages,Spanish
+Languages,Mandarin
+Languages,French
+Languages,German
+Languages,Japanese
+Languages,Italian
+Languages,Russian
+Languages,Portuguese
+Languages,Hindi
+Languages,Arabic
+Languages,Korean
+Languages,Turkish
+Languages,Polish
+Languages,Dutch
+Languages,Swedish
+Languages,Greek
+Languages,Hebrew
+Languages,Thai
+Languages,Indonesian
+Languages,Vietnamese
+Languages,Czech
+Languages,Ukrainian
+Languages,Latin
+Languages,Bengali
+Languages,Persian
+Languages,Malayalam
+Languages,Tamil
+Languages,Urdu
+Languages,Swahili
+Languages,Norwegian
+Languages,Filipino
+Languages,Danish
+Languages,Hungarian
+Languages,Finnish
+Languages,Malay
+Languages,Maori
+Languages,Basque
+Languages,Catalan
+Languages,Welsh
+Languages,Galician
+Languages,Esperanto
+Languages,Zulu
+Languages,Xhosa
+Languages,Yoruba
+Languages,Hausa
+Languages,Amharic
+Languages,Quechua
+Languages,Inuktitut
+Languages,Navajo
+Languages,Cherokee
+Languages,Sanskrit
+Writing,Creative Writing
+Writing,Technical Writing
+Writing,Copywriting
+Writing,Editing
+Writing,Proofreading
+Writing,Content Strategy
+Writing,SEO Writing
+Writing,Grant Writing
+Writing,Blogging
+Writing,Scriptwriting
+Writing,Speechwriting
+Writing,Journalism
+Writing,Academic Writing
+Writing,Resume Writing
+Writing,Social Media Writing
+Writing,Email Writing
+Writing,White Papers
+Writing,Case Studies
+Writing,Product Descriptions
+Writing,Storytelling
+Writing,Transcription
+Writing,Translation
+Writing,Patents Writing
+Writing,Screenwriting
+Writing,Playwriting
+Writing,Podcast Scripting
+Writing,Brand Voice Development
+Writing,Creative Nonfiction
+Writing,Copy Editing
+Writing,Developmental Editing
+Writing,Fact-Checking
+Writing,Multilingual Writing
+Writing,Writing for Children
+Writing,Grant Proposal Writing
+Writing,Scientific Writing
+Writing,Press Release Writing
+Writing,Technical Documentation
+Writing,User Manuals
+Writing,Collaboration Writing Tools
+Writing,Content Editing
+Writing,Typography for Writers
+Writing,Blogging Platforms
+Instruments,Piano
+Instruments,Guitar
+Instruments,Violin
+Instruments,Drums
+Instruments,Saxophone
+Instruments,Flute
+Instruments,Cello
+Instruments,Trumpet
+Instruments,Clarinet
+Instruments,Harp
+Instruments,Trombone
+Instruments,Bass Guitar
+Instruments,Accordion
+Instruments,Tuba
+Instruments,Double Bass
+Instruments,Oboe
+Instruments,Banjo
+Instruments,Ukulele
+Instruments,Harmonica
+Instruments,Marimba
+Instruments,Melodica
+Instruments,Synthesizer
+Instruments,Electric Violin
+Instruments,Electric Guitar
+Instruments,Bongo Drums
+Instruments,Conga Drums
+Instruments,Djembe
+Instruments,Dulcimer
+Instruments,French Horn
+Instruments,Glockenspiel
+Instruments,Lute
+Instruments,Mandolin
+Instruments,Maracas
+Instruments,Ocarina
+Instruments,Pennywhistle
+Instruments,Recorder
+Instruments,Sitar
+Instruments,Sitar
+Instruments,Tambourine
+Instruments,Timpani
+Instruments,Triangle
+Design,Graphic Design
+Design,UX Design
+Design,UI Design
+Design,Web Design
+Design,Animation
+Design,3D Modeling
+Design,Video Editing
+Design,Illustration
+Design,Typography
+Design,Branding
+Design,Packaging Design
+Design,Product Design
+Design,Interior Design
+Design,Architectural Design
+Design,Game Design
+Design,Motion Graphics
+Design,Photography
+Design,Wireframing
+Design,Prototyping
+Design,Color Theory
+Design,Print Design
+Design,Environmental Design
+Design,Exhibition Design
+Design,Fashion Design
+Design,Iconography
+Design,Information Architecture
+Design,Interactive Design
+Design,Landscape Design
+Design,Lighting Design
+Design,Mural Art
+Design,Photography Editing
+Design,Storyboard Design
+Design,Technical Illustration
+Design,Typography for UI
+Design,Video Production
+Design,Visual Storytelling
+Design,Visual Effects (VFX)
+Design,Wayfinding Design
+Marketing,SEO
+Marketing,PPC Advertising
+Marketing,Content Marketing
+Marketing,Email Marketing
+Marketing,Social Media Marketing
+Marketing,Affiliate Marketing
+Marketing,Influencer Marketing
+Marketing,Market Research
+Marketing,Brand Management
+Marketing,Digital Analytics
+Marketing,Google Analytics
+Marketing,Conversion Rate Optimization
+Marketing,Copywriting
+Marketing,Event Marketing
+Marketing,Mobile Marketing
+Marketing,Video Marketing
+Marketing,Lead Generation
+Marketing,Customer Relationship Management (CRM)
+Marketing,Public Relations
+Marketing,Marketing Automation
+Marketing,Campaign Management
+Marketing,Product Marketing
+Marketing,Telemarketing
+Marketing,Print Advertising
+Marketing,Direct Mail Marketing
+Marketing,B2B Marketing
+Marketing,B2C Marketing
+Marketing,Guerrilla Marketing
+Marketing,Inbound Marketing
+Marketing,Outbound Marketing
+Marketing,Retargeting Campaigns
+Marketing,Webinars
+Marketing,Sales Funnel Optimization
+Marketing,Brand Positioning
+Marketing,Content Creation
+Marketing,Community Management
+Marketing,Data-Driven Marketing
+Business,Project Management
+Business,Negotiation
+Business,Financial Analysis
+Business,Accounting
+Business,Business Strategy
+Business,Operations Management
+Business,Human Resources
+Business,Supply Chain Management
+Business,Sales Management
+Business,Customer Service
+Business,Product Management
+Business,Entrepreneurship
+Business,Change Management
+Business,Business Development
+Business,Corporate Governance
+Business,Risk Management
+Business,Compliance
+Business,Lean Management
+Business,Agile Methodology
+Business,Budgeting
+Business,Conflict Resolution
+Business,Corporate Social Responsibility
+Business,Investor Relations
+Business,Market Analysis
+Business,Strategic Planning
+Business,Performance Management
+Business,Team Leadership
+Business,Training & Development
+Business,Financial Planning
+Business,Stakeholder Engagement
+Business,Mergers & Acquisitions
+Business,Business Intelligence
+Business,Cost Control
+Business,Quality Assurance
+Data & Analytics,SQL
+Data & Analytics,Excel
+Data & Analytics,Data Visualization
+Data & Analytics,Tableau
+Data & Analytics,Power BI
+Data & Analytics,Data Mining
+Data & Analytics,Big Data
+Data & Analytics,R Programming
+Data & Analytics,Python for Data Analysis
+Data & Analytics,Machine Learning
+Data & Analytics,Deep Learning
+Data & Analytics,Statistical Analysis
+Data & Analytics,Hadoop
+Data & Analytics,Spark
+Data & Analytics,ETL Processes
+Data & Analytics,Data Warehousing
+Data & Analytics,Data Governance
+Data & Analytics,Predictive Analytics
+Data & Analytics,Natural Language Processing (NLP)
+Data & Analytics,Sentiment Analysis
+Data & Analytics,Data Cleansing
+Data & Analytics,Data Modeling
+Data & Analytics,Database Management
+Data & Analytics,Cluster Analysis
+Data & Analytics,Regression Analysis
+Data & Analytics,Time Series Analysis
+Data & Analytics,Dashboard Design
+Data & Analytics,Data Quality Assurance
+Data & Analytics,Data Architecture
+Data & Analytics,Data Engineering
+Data & Analytics,Business Intelligence Tools
+Data & Analytics,SQL Server
+Data & Analytics,Oracle Database
+Data & Analytics,Google BigQuery
+Data & Analytics,Amazon Redshift
+Personal Development,Public Speaking
+Personal Development,Time Management
+Personal Development,Leadership
+Personal Development,Emotional Intelligence
+Personal Development,Stress Management
+Personal Development,Networking
+Personal Development,Conflict Resolution
+Personal Development,Decision Making
+Personal Development,Critical Thinking
+Personal Development,Creativity
+Personal Development,Mindfulness
+Personal Development,Goal Setting
+Personal Development,Negotiation Skills
+Personal Development,Self-motivation
+Personal Development,Adaptability
+Personal Development,Problem Solving
+Personal Development,Teamwork
+Personal Development,Personal Finance
+Personal Development,Work-Life Balance
+Personal Development,Meditation
+Personal Development,Resilience
+Personal Development,Self-Discipline
+Personal Development,Coaching
+Personal Development,Mentoring
+Personal Development,Assertiveness
+Personal Development,Emotional Regulation
+Personal Development,Stress Reduction Techniques
+Personal Development,Personal Branding
+Personal Development,Learning Strategies
+Personal Development,Positive Psychology
+Personal Development,Focus and Concentration
+Personal Development,Empathy Development
+Personal Development,Cultural Competence
+Sports & Fitness,Yoga
+Sports & Fitness,Running
+Sports & Fitness,Weightlifting
+Sports & Fitness,Swimming
+Sports & Fitness,Cycling
+Sports & Fitness,Pilates
+Sports & Fitness,Martial Arts
+Sports & Fitness,CrossFit
+Sports & Fitness,Boxing
+Sports & Fitness,HIIT
+Sports & Fitness,Rowing
+Sports & Fitness,Climbing
+Sports & Fitness,Dancing
+Sports & Fitness,Team Sports
+Sports & Fitness,Gymnastics
+Sports & Fitness,Skiing
+Sports & Fitness,Snowboarding
+Sports & Fitness,Tennis
+Sports & Fitness,Golf
+Sports & Fitness,Archery
+Sports & Fitness,Parkour
+Sports & Fitness,Trail Running
+Sports & Fitness,Surfing
+Sports & Fitness,Soccer
+Sports & Fitness,Basketball
+Sports & Fitness,Volleyball
+Sports & Fitness,Table Tennis
+Sports & Fitness,Skateboarding
+Sports & Fitness,Speed Skating
+Sports & Fitness,Weight Training
+Sports & Fitness,Aerobics
+Sports & Fitness,Stretching Techniques
+Sports & Fitness,Personal Training
+Sports & Fitness,Swimming Coaching
+Sports & Fitness,Bodybuilding
+Sports & Fitness,Martial Arts Coaching
+Culinary Arts,Baking
+Culinary Arts,Grilling
+Culinary Arts,Food Plating
+Culinary Arts,Sous Vide Cooking
+Culinary Arts,Knife Skills
+Culinary Arts,Recipe Development
+Culinary Arts,Chocolate Making
+Culinary Arts,Catering
+Culinary Arts,Food Safety
+Culinary Arts,Vegan Cooking
+Culinary Arts,Gluten-Free Cooking
+Culinary Arts,Food Preservation
+Culinary Arts,Fermentation
+Culinary Arts,Wine Tasting
+Culinary Arts,Cocktail Mixing
+Culinary Arts,Cheese Making
+Culinary Arts,Seafood Preparation
+Culinary Arts,Sauce Making
+Culinary Arts,Food Photography
+Culinary Arts,Pastry Arts
+Culinary Arts,Culinary Nutrition
+Culinary Arts,Molecular Gastronomy
+Culinary Arts,Herbal Cooking
+Culinary Arts,Ethnic Cuisine
+Culinary Arts,Food Styling
+Culinary Arts,Barista Skills
+Culinary Arts,Food Science
+Culinary Arts,Grain Milling
+Culinary Arts,Knife Sharpening
+Culinary Arts,Meat Butchering
+Culinary Arts,Food Truck Operation
+Crafts & DIY,Woodworking
+Crafts & DIY,Sewing
+Crafts & DIY,Pottery
+Crafts & DIY,Crochet
+Crafts & DIY,Knitting
+Crafts & DIY,Jewelry Making
+Crafts & DIY,Leatherworking
+Crafts & DIY,Painting
+Crafts & DIY,Candle Making
+Crafts & DIY,Origami
+Crafts & DIY,Calligraphy
+Crafts & DIY,Glass Blowing
+Crafts & DIY,Embroidery
+Crafts & DIY,Model Building
+Crafts & DIY,Paper Craft
+Crafts & DIY,Mosaic Art
+Crafts & DIY,Stained Glass
+Crafts & DIY,Metalworking
+Crafts & DIY,Upcycling
+Crafts & DIY,Home Improvement
+Crafts & DIY,Macrame
+Crafts & DIY,Quilting
+Crafts & DIY,Tapestry Weaving
+Crafts & DIY,Wood Carving
+Crafts & DIY,Model Railroading
+Crafts & DIY,Screen Printing
+Crafts & DIY,Stencil Art
+Crafts & DIY,Sculpting
+Crafts & DIY,Tile Setting
+Crafts & DIY,Wall Murals
+Crafts & DIY,Bookbinding
+Crafts & DIY,Doll Making
+Crafts & DIY,Calligraphy Art
+Crafts & DIY,Digital Art
+Crafts & DIY,Fiber Arts
+Crafts & DIY,Needle Felting
+Crafts & DIY,Soap Making
+Crafts & DIY,Basket Weaving
+Crafts & DIY,Clay Modeling
+Crafts & DIY,Stamp Collecting
+Crafts & DIY,Model Kit Assembly
+Crafts & DIY,Origami Advanced
+Crafts & DIY,Rubber Stamping
+Crafts & DIY,Fabric Dyeing
+Crafts & DIY,Felting
+Crafts & DIY,Glass Etching
+Crafts & DIY,Paper Mache
+Crafts & DIY,Leather Tooling
+Crafts & DIY,Button Making
+Crafts & DIY,Papercraft Engineering
+Crafts & DIY,Silk Painting
+Crafts & DIY,Toy Making
+Crafts & DIY,Wire Wrapping
+category,skill
+Tech,Web Security
+Tech,Cloud Security
+Tech,Virtualization
+Tech,API Development
+Tech,Mobile App Development
+Tech,Progressive Web Apps
+Tech,Cross-platform Development
+Tech,Augmented Reality (AR)
+Tech,Virtual Reality (VR)
+Tech,Game Engine (Unity)
+Tech,Game Engine (Unreal)
+Tech,Code Review
+Tech,Software Testing
+Tech,Load Testing
+Tech,Performance Tuning
+Tech,Debugging
+Tech,Code Optimization
+Tech,Embedded Linux
+Tech,Systems Programming
+Tech,Data Structures
+Tech,Algorithms
+Tech,Concurrency
+Tech,Parallel Computing
+Tech,Functional Programming
+Tech,Object-Oriented Programming
+Tech,Low-Level Programming
+Tech,Cloud Cost Management
+Tech,Cloud Migration
+Tech,Database Administration
+Tech,Data Backup & Recovery
+Tech,Network Administration
+Tech,IT Compliance
+Tech,Identity and Access Management
+Tech,Disaster Recovery Planning
+Tech,Virtual Desktop Infrastructure
+Tech,Edge AI
+Tech,Quantum Computing Basics
+Tech,Chatbot Development
+Tech,NLP Engineering
+Languages,American Sign Language (ASL)
+Languages,British Sign Language (BSL)
+Languages,Latin American Spanish
+Languages,Brazilian Portuguese
+Languages,Simplified Chinese
+Languages,Traditional Chinese
+Languages,Basque
+Languages,Cornish
+Languages,Frisian
+Languages,Gaelic
+Languages,Haitian Creole
+Languages,Inuktitut
+Languages,Luxembourgish
+Languages,Maltese
+Languages,Occitan
+Languages,Pashto
+Languages,Quechua
+Languages,Rhaeto-Romance
+Languages,Samoan
+Languages,Sicilian
+Languages,Tahitian
+Languages,Twi
+Languages,Udmurt
+Languages,Walloon
+Writing,Technical Editing
+Writing,Legal Writing
+Writing,Medical Writing
+Writing,Creative Copywriting
+Writing,Transcreation
+Writing,Localization Writing
+Writing,Instructional Design
+Writing,Content Localization
+Writing,Dialogue Writing
+Writing,Interactive Writing
+Writing,Knowledge Base Writing
+Writing,Product Copy
+Writing,Direct Response Copywriting
+Writing,Proposal Writing
+Writing,Grant Proposal Editing
+Writing,Online Course Content
+Instruments,Steel Drums
+Instruments,Bagpipes
+Instruments,Didgeridoo
+Instruments,Kalimba
+Instruments,Shamisen
+Instruments,Santur
+Instruments,Kora
+Instruments,Erhu
+Instruments,Dizi
+Instruments,Pipa
+Instruments,Taiko Drums
+Instruments,Guzheng
+Instruments,Pan Flute
+Instruments,Oud
+Instruments,Clavichord
+Instruments,Harpsichord
+Instruments,Lyre
+Design,User Research
+Design,Design Thinking
+Design,Accessibility Design
+Design,Infographics
+Design,Editorial Design
+Design,Exhibition Booth Design
+Design,Mobile UX
+Design,Packaging Engineering
+Design,Creative Direction
+Design,Photo Editing
+Design,Print Production
+Design,Spatial Design
+Design,Typographic Design
+Design,Visual Identity
+Marketing,Sales Copywriting
+Marketing,Brand Storytelling
+Marketing,Customer Segmentation
+Marketing,Direct Response Marketing
+Marketing,E-commerce Marketing
+Marketing,Marketing Analytics
+Marketing,Online Advertising
+Marketing,Podcast Marketing
+Marketing,Product Launch Marketing
+Marketing,Referral Marketing
+Business,Stakeholder Management
+Business,Business Process Improvement
+Business,Financial Reporting
+Business,Organizational Development
+Business,Procurement
+Business,Vendor Management
+Business,Change Leadership
+Business,Decision Analysis
+Business,Strategic Partnerships
+Business,Competitive Analysis
+Data & Analytics,Data Science
+Data & Analytics,Artificial Intelligence
+Data & Analytics,Computer Vision
+Data & Analytics,Data Ethics
+Data & Analytics,Data Privacy
+Data & Analytics,Data Storytelling
+Data & Analytics,Data Journalism
+Personal Development,Self-Awareness
+Personal Development,Positive Communication
+Personal Development,Conflict Mediation
+Personal Development,Career Coaching
+Personal Development,Life Coaching
+Sports & Fitness,Trail Biking
+Sports & Fitness,Synchronized Swimming
+Sports & Fitness,Water Polo
+Sports & Fitness,Triathlon Training
+Sports & Fitness,Parkour Coaching
+Sports & Fitness,Kettlebell Training
+Sports & Fitness,Athletic Training
+Sports & Fitness,Obstacle Course Racing
+Culinary Arts,Plant-Based Cooking
+Culinary Arts,Food Sustainability
+Culinary Arts,Canning & Preserving
+Culinary Arts,Butchery
+Culinary Arts,Fermented Foods
+Culinary Arts,Tea Blending
+Culinary Arts,Culinary Entrepreneurship
+Crafts & DIY,Leather Crafting
+Crafts & DIY,Metal Sculpture
+Crafts & DIY,Fabric Printing
+Crafts & DIY,Book Restoration
+Crafts & DIY,Calligraphy Styles
+Crafts & DIY,Ceramics Glazing
+Crafts & DIY,Textile Arts
+Crafts & DIY,Papercutting Art
+Crafts & DIY,Folk Art
+Crafts & DIY,Digital Fabrication
