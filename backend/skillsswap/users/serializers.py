@@ -27,7 +27,6 @@ class UserSkillSerializer(serializers.ModelSerializer):
         source="user",
         write_only=True,
     )
-    journals = JournalSerializer(many=True, read_only=True)
 
     class Meta:
         model = UserSkill
@@ -37,7 +36,6 @@ class UserSkillSerializer(serializers.ModelSerializer):
             "user_id",
             "skill_id",
             "skill",
-            "journals",
             "proficiency",
             "created_at",
             "updated_at",

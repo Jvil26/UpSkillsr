@@ -44,7 +44,9 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
   const [answers, setAnswers] = useState<Record<string, string>>(() =>
     PROMPT_LABELS.reduce((acc, prompt) => ({ ...acc, [prompt.id]: "" }), {})
   );
-  const [viewMode, setViewMode] = useState<ViewMode>((searchParams.get("viewMode") as ViewMode) || VIEW_MODES.PREVIEW);
+  const [viewMode, setViewMode] = useState<ViewMode>(
+    (searchParams.get("viewMode") as ViewMode) || isNew ? VIEW_MODES.EDIT : VIEW_MODES.PREVIEW
+  );
 
   const { mutateAsync: createJournal, isPending: createPending } = useCreateJournal();
   const { mutateAsync: updateJournalById, isPending: updatePending } = useUpdateJournalById();
@@ -73,7 +75,7 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
 
   const handleViewChange = (viewMode: ViewMode) => {
     setViewMode(viewMode);
-    router.replace(`/skills/${userSkillId}/journals/${journalId}?viewMode=${viewMode}`);
+    router.replace(`/skills/${userSkillId}/journals/${isNew ? "new" : journalId}?viewMode=${viewMode}`);
   };
 
   const handlePromptInputChange = (id: string, value: string) => {
@@ -128,7 +130,10 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
         journal = await updateJournalById({ id: journalId, journalData: formData });
       }
 
+      console.log("RESOURCE LINKS BEFORE", resourceLinks);
+
       if (journal?.id && resourceLinks) {
+        console.log("RESOURCE LINKS AFTER", resourceLinks);
         try {
           const resourceLinksData = resourceLinks.filter((rl) => rl.title?.trim() && rl.url?.trim() && rl.type?.trim());
           await batchUpdateResourceLinks({ journalId: journal.id, resourceLinks: resourceLinksData });
@@ -137,6 +142,7 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
           return;
         }
       }
+
       router.replace(`/skills/${userSkillId}/journals/${journal?.id}`);
       toast.success("Journal saved successfully!");
       console.log("Saving journal:", Object.fromEntries(formData.entries()));

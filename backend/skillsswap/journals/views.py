@@ -5,9 +5,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from journals.models import Journal, ResourceLink
 from journals.serializers import JournalSerializer, ResourceLinkSerializer
+from .pagination import JournalPagination
 import anthropic
 import tiktoken
 import json
+
 
 client = anthropic.Anthropic()
 encoding = tiktoken.get_encoding("cl100k_base")
@@ -21,9 +23,12 @@ def journals_list(request):
     List all journals, or create a journal.
     """
     if request.method == "GET":
-        journals = Journal.objects.all()
-        serializer = JournalSerializer(journals, many=True)
-        return Response(serializer.data)
+        journals = Journal.objects.all().order_by("-created_at")
+        pagination = JournalPagination()
+        results_page = pagination.paginate_queryset(journals, request)
+
+        serializer = JournalSerializer(results_page, many=True)
+        return pagination.get_paginated_response(serializer.data)
 
     elif request.method == "POST":
         serializer = JournalSerializer(data=request.data)
@@ -55,6 +60,34 @@ def journals_detail(request, pk):
     elif request.method == "DELETE":
         journal.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+def journals_by_user(request, username):
+    """
+    Get all journals for a specific user given username
+    """
+    journals = Journal.objects.filter(user_skill__user__username=username).order_by(
+        "-created_at"
+    )
+    pagination = JournalPagination()
+    results_page = pagination.paginate_queryset(journals, request)
+    serializer = JournalSerializer(results_page, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def journals_by_user_skill(request, user_skill_id):
+    """
+    Get all journals for a user_skill
+    """
+    journals = Journal.objects.filter(user_skill_id=user_skill_id).order_by(
+        "-created_at"
+    )
+    pagination = JournalPagination()
+    result_page = pagination.paginate_queryset(journals, request)
+    serializer = JournalSerializer(result_page, many=True)
+    return pagination.get_paginated_response(serializer.data)
 
 
 @api_view(["GET", "POST"])
@@ -115,26 +148,6 @@ def resource_links_batch(request, journalId):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(["GET"])
-def journals_by_user(request, username):
-    """
-    Get all journals for a specific user given username
-    """
-    user_journals = Journal.objects.filter(user_skill__user__username=username)
-    serializer = JournalSerializer(user_journals, many=True)
-    return Response(serializer.data)
-
-
-@api_view(["GET"])
-def journals_by_user_skill(request, user_skill_id):
-    """
-    Get all journals for a user_skill
-    """
-    user_skill_journals = Journal.objects.filter(user_skill_id=user_skill_id)
-    serializer = JournalSerializer(user_skill_journals, many=True)
-    return Response(serializer.data)
-
-
 @api_view(["POST"])
 def generate_journal_summary(request):
     """
@@ -144,7 +157,12 @@ def generate_journal_summary(request):
         text_content = request.data.get("textContent")
         tokens_len = token_count(text_content)
         if tokens_len > MAX_INPUT_TOKEN_LEN:
-            return Response({"error": "Your prompt is too long. Please shorten your input and try again."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "error": "Your prompt is too long. Please shorten your input and try again."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         message = client.messages.create(
             model="claude-3-5-haiku-20241022",
             max_tokens=3000,
@@ -173,6 +191,14 @@ def generate_journal(request):
     """
     try:
         prompts = request.data.get("prompts")
+        tokens_len = token_count(prompts)
+        if tokens_len > MAX_INPUT_TOKEN_LEN:
+            return Response(
+                {
+                    "error": "Your prompt is too long. Please shorten your input and try again."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         message = client.messages.create(
             model="claude-3-5-haiku-20241022",
             max_tokens=3000,
@@ -230,31 +256,54 @@ def build_llm_journal_prompt(prompts):
         """
 
 
-def build_llm_summary_prompt(text_content):
+def build_llm_journal_prompt(prompts):
+    users_responses = []
+    for i, prompt in enumerate(prompts):
+        users_responses.append(
+            f"{i+1}. {prompt['question']}\nAnswer: {prompt['answer']}"
+        )
+
     return f"""
-    Journal Entry:
-    \"\"\"
-    {text_content}
-    \"\"\"
+        Use the answers to write:
+        - A concise, descriptive title (limit to 50 characters)
+        - A detailed journal entry in natural language that sounds reflective and personal
+        - (Optional) If relevant, suggest a YouTube URL that could help reinforce the learning
+        - A brief summary capturing the key insights of the journal entry
 
-    Summarize the journal entry using the following sections — include only the relevant ones:
+        **Summary Instructions:**
+        Summarize the journal entry using the following sections — include only the relevant ones:
 
-    1. **Key Learnings** — What important concepts or takeaways did the user understand?
-    2. **Misunderstandings & Clarifications** — Only include this if the user had incorrect assumptions or confusion that got resolved.
-    3. **Implementation Notes** — Briefly describe how the user approached the task, including techniques or tools used — only if they are important to the learning.
+        1. **Key Learnings** — What important concepts or takeaways did the user understand?
+        2. **Misunderstandings & Clarifications** — Only include this if the user had incorrect assumptions or confusion that got resolved.
+        3. **Implementation Notes** — Briefly describe how the user approached the task, including techniques or tools used — only if they are important to the learning.
 
-    Do not include any other sections or interpretations. Only return the relevant sections, in this order, with the section titles exactly as written.
-    """
+        Do not include any other sections or interpretations. Only return the relevant sections, in this order, with the section titles exactly as written.
+
+        Respond with **only** valid JSON (no markdown, no explanation), and make sure all newline characters inside strings are properly escaped with \\n.
+
+        Format the response in JSON with the following fields:
+        {{
+        "title": string,
+        "text_content": string,
+        "youtube_url": string (or null if not applicable),
+        "summary": string
+        }}
+
+        User's responses:
+        {("\n\n").join(users_responses)}
+        """
 
 
 def token_count(input):
-    if isinstance(input, dict):
+    if isinstance(input, list):
         total_tokens = 0
-        for question, answer in input.items():
-            total_tokens += len(encoding.encode(question))
+        for object in input:
+            if isinstance(object["question"], str):
+                total_tokens += len(encoding.encode(object["question"]))
+            if isinstance(object["answer"], str):
+                total_tokens += len(encoding.encode(object["answer"]))
         return total_tokens
-    else:
-        total_tokens = 
+    elif isinstance(input, str):
+        total_tokens += len(encoding.encode(input))
 
-    tokens = encoding.encode(input)
-    return len(tokens)
+    return total_tokens

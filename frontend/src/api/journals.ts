@@ -1,4 +1,13 @@
-import { Journal, journalSchema, Prompts, resourceLinksSchema, ResourceLinks, ResourceLink } from "@/lib/types";
+import {
+  Journal,
+  journalSchema,
+  Prompts,
+  resourceLinksSchema,
+  ResourceLinks,
+  ResourceLink,
+  PaginatedJournals,
+  paginatedJournalsSchema,
+} from "@/lib/types";
 import { z } from "zod";
 import { fetchWithAuth } from "@/lib/utils";
 
@@ -12,6 +21,24 @@ export async function fetchJournalById(id: number): Promise<Journal | undefined>
     }
     const validatedJournalJSON = journalSchema.parse(resJSON);
     return validatedJournalJSON;
+  } catch (error) {
+    console.error(`Failed to fetch journal by id: ${id}`, error);
+  }
+}
+
+export async function fetchJournalsByUserSkillId(id: number, page: number): Promise<PaginatedJournals | undefined> {
+  try {
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/user-skill/${id}/?page=${page}`
+    );
+    const resJSON = await res.json();
+
+    if (!res.ok) {
+      throw new Error(JSON.stringify(resJSON));
+    }
+    const validatedJournalsJSON = paginatedJournalsSchema.parse(resJSON);
+    console.log(validatedJournalsJSON);
+    return validatedJournalsJSON;
   } catch (error) {
     console.error(`Failed to fetch journal by id: ${id}`, error);
   }

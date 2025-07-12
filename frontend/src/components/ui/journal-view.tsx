@@ -10,10 +10,10 @@ type JournalViewProps = {
   title: string;
   textContent: string;
   media: string | null | undefined;
-  summary: string;
+  summary: string | null;
   resourceLinks: { type: string; title: string; url: string }[];
   createdAt: string | undefined;
-  onViewChange: (viewMode: ViewMode) => void;
+  onViewChange?: (viewMode: ViewMode) => void;
 };
 
 export default function JournalView({
@@ -29,11 +29,13 @@ export default function JournalView({
     <div className="flex flex-col w-full max-w-5xl mx-auto mt-7 border border-border rounded-xl p-6 shadow-xl bg-muted">
       <div className="flex justify-between items-center mb-1">
         <h1 className="text-3xl font-bold">{title}</h1>
-        <div className="flex justify-end px-6">
-          <Button className="px-6" onClick={() => onViewChange(VIEW_MODES.EDIT)}>
-            {VIEW_MODES.EDIT}
-          </Button>
-        </div>
+        {onViewChange && (
+          <div className="flex justify-end px-6">
+            <Button className="px-6" onClick={() => onViewChange(VIEW_MODES.EDIT)}>
+              {VIEW_MODES.EDIT}
+            </Button>
+          </div>
+        )}
       </div>
       {createdAt && <p className="text-muted-foreground">Created At: {new Date(createdAt).toLocaleString()}</p>}
       <div>

@@ -62,12 +62,18 @@ export const journalSchema = z.object({
 
 export const journalsSchema = z.array(journalSchema);
 
+export const paginatedJournalsSchema = z.object({
+  current_page: z.number(),
+  total_pages: z.number(),
+  total: z.number(),
+  results: journalsSchema,
+});
+
 export const userSkillSchema = z.object({
   id: z.number(),
   user: z.number(),
   skill: skillSchema,
   proficiency: z.enum(["Beginner", "Intermediate", "Advanced"]),
-  journals: journalsSchema,
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
 });
@@ -106,3 +112,4 @@ export type Journal = z.infer<typeof journalSchema>;
 export type Journals = z.infer<typeof journalsSchema>;
 export type ResourceLink = z.infer<typeof resourceLinkSchema>;
 export type ResourceLinks = z.infer<typeof resourceLinksSchema>;
+export type PaginatedJournals = z.infer<typeof paginatedJournalsSchema>;
