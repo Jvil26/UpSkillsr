@@ -1,8 +1,8 @@
 "use client";
 
-import { Label } from "./label";
-import { Textarea } from "./textarea";
-import { Button } from "./button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 
 type AIInputPanelProps = {
@@ -17,7 +17,7 @@ type AIInputPanelProps = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
-export default function AIInputPanel({
+export default function JournalAIInputPanel({
   promptLabels,
   isGeneratingJournal,
   onChange,

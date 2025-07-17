@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import JournalView from "./journal-view";
-import AIInputPanel from "./ai-input-panel";
-import { Button } from "./button";
+import JournalAIInputPanel from "./journal-ai-input-panel";
+import { Button } from "../ui/button";
 import { useFetchJournalById } from "@/hooks/journals";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -45,7 +45,7 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
     PROMPT_LABELS.reduce((acc, prompt) => ({ ...acc, [prompt.id]: "" }), {})
   );
   const [viewMode, setViewMode] = useState<ViewMode>(
-    (searchParams.get("viewMode") as ViewMode) || isNew ? VIEW_MODES.EDIT : VIEW_MODES.PREVIEW
+    (searchParams.get("viewMode") as ViewMode) ?? (isNew ? VIEW_MODES.EDIT : VIEW_MODES.PREVIEW)
   );
 
   const { mutateAsync: createJournal, isPending: createPending } = useCreateJournal();
@@ -130,16 +130,12 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
         journal = await updateJournalById({ id: journalId, journalData: formData });
       }
 
-      console.log("RESOURCE LINKS BEFORE", resourceLinks);
-
       if (journal?.id && resourceLinks) {
-        console.log("RESOURCE LINKS AFTER", resourceLinks);
         try {
           const resourceLinksData = resourceLinks.filter((rl) => rl.title?.trim() && rl.url?.trim() && rl.type?.trim());
           await batchUpdateResourceLinks({ journalId: journal.id, resourceLinks: resourceLinksData });
         } catch {
           toast.error("Journal saved but failed to update resource links.");
-          return;
         }
       }
 
@@ -230,7 +226,7 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
                 {createPending || updatePending ? "Saving..." : "Save"}
               </Button>
             </div>
-            <AIInputPanel
+            <JournalAIInputPanel
               promptLabels={PROMPT_LABELS}
               answers={answers}
               isGeneratingJournal={isGeneratingJournal}
@@ -241,7 +237,6 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
           <JournalEdit
             title={title}
             textContent={textContent}
-            media={journal?.media}
             resourceLinks={resourceLinks}
             updateResourceLink={updateResourceLink}
             addResourceLink={addResourceLink}
@@ -261,7 +256,7 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
         <JournalView
           title={title}
           textContent={textContent}
-          media={journal?.media}
+          media={media || journal?.media}
           resourceLinks={resourceLinks}
           summary={summary}
           onViewChange={handleViewChange}

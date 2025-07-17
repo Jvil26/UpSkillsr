@@ -1,8 +1,10 @@
 "use client";
+
+import React from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Draggable } from "./draggable";
+import { Draggable } from "../ui/draggable";
 import { CATEGORY_BG_COLORS, LEVEL_BG_COLORS } from "@/lib/const";
 import {
   DropdownMenu,
@@ -11,8 +13,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
-import React from "react";
-import { useUpdateUserSkillById, useDeleteUserSkillById } from "@/hooks/users";
+import { useDeleteUserSkillById } from "@/hooks/users";
+// import { useUpdateUserSkillById } from "@/hooks/users";
 
 type SkillCardProps = {
   id: number;
@@ -25,7 +27,7 @@ type SkillCardProps = {
 
 export function SkillCard({ id, skillName, category, proficiency, created_at, width }: SkillCardProps) {
   const { mutate: deleteUserSkillById } = useDeleteUserSkillById();
-  const { mutate: updateUserSkillById } = useUpdateUserSkillById();
+  // const { mutate: updateUserSkillById } = useUpdateUserSkillById();
   const router = useRouter();
 
   const handleEditSkill = (e: React.MouseEvent) => {

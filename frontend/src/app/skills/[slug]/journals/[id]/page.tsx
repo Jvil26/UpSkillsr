@@ -1,4 +1,4 @@
-import JournalCreator from "@/components/ui/journal-creator";
+import { JournalCreator } from "@/components/journals";
 
 export default async function JournalPage({ params }: { params: Promise<{ id: string; slug: number }> }) {
   const { id: journalId, slug: userSkillId } = await params;

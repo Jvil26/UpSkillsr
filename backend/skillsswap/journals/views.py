@@ -217,7 +217,7 @@ def generate_journal(request):
         journal_json = json.loads(message.content[0].text)
         if journal_json and all(
             journal_json.get(field) is not None
-            for field in ["title", "text_content", "youtube_url", "summary"]
+            for field in ["title", "text_content", "summary"]
         ):
             return Response(journal_json, status=status.HTTP_200_OK)
         else:
@@ -228,32 +228,23 @@ def generate_journal(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def build_llm_journal_prompt(prompts):
-    users_responses = []
-    for i, prompt in enumerate(prompts):
-        users_responses.append(
-            f"{(i+1)}. {prompt["question"]}\nAnswer: {prompt["answer"]}"
-        )
-
+def build_llm_summary_prompt(text_content):
     return f"""
-        Use the answers to write:
-        - A concise, descriptive title (limit to 50 characters)
-        - A detailed journal entry in natural language that sounds reflective and personal
-        - (Optional) If relevant, suggest a YouTube URL that could help reinforce the learning
-        - A brief summary capturing the key insights of the journal entry
+    Journal Entry:
+    \"\"\"
+    {text_content}
+    \"\"\"
 
-        Respond with **only** valid JSON (no markdown, no explanation), and make sure all newline characters inside strings are properly escaped with \\n.
 
-        Format the response in JSON with the following fields:
-        {{
-        "title": string,
-        "text_content": string,
-        "youtube_url": string (or null if not applicable)
-        "summary": string
-        }}
+    Summarize the journal entry using the following sections — include only the relevant ones:
 
-        User's responses: {("\n\n").join(users_responses)}
-        """
+
+    1. **Key Learnings** — What important concepts or takeaways did the user understand?
+    2. **Misunderstandings & Clarifications** — Only include this if the user had incorrect assumptions or confusion that got resolved.
+    3. **Implementation Notes** — Briefly describe how the user approached the task, including techniques or tools used — only if they are important to the learning.
+
+    Do not include any other sections or interpretations. Only return the relevant sections, in this order, with the section titles exactly as written.
+    """
 
 
 def build_llm_journal_prompt(prompts):
@@ -263,11 +254,11 @@ def build_llm_journal_prompt(prompts):
             f"{i+1}. {prompt['question']}\nAnswer: {prompt['answer']}"
         )
 
+    joined_responses = ("\n\n").join(users_responses)
     return f"""
         Use the answers to write:
         - A concise, descriptive title (limit to 50 characters)
         - A detailed journal entry in natural language that sounds reflective and personal
-        - (Optional) If relevant, suggest a YouTube URL that could help reinforce the learning
         - A brief summary capturing the key insights of the journal entry
 
         **Summary Instructions:**
@@ -285,12 +276,11 @@ def build_llm_journal_prompt(prompts):
         {{
         "title": string,
         "text_content": string,
-        "youtube_url": string (or null if not applicable),
         "summary": string
         }}
 
         User's responses:
-        {("\n\n").join(users_responses)}
+        {joined_responses}
         """
 
 

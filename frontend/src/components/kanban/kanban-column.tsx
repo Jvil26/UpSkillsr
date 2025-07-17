@@ -1,8 +1,8 @@
 "use state";
 import { useState } from "react";
-import { SkillCard } from "./skill-card";
-import { Droppable } from "./droppable";
-import { UserSkillDialog } from "./user-skill-dialog";
+import { SkillCard } from "@/components/ui/skill-card";
+import { Droppable } from "../ui/droppable";
+import { UserSkillDialog } from "../ui/user-skill-dialog";
 import { Skill, Skills, UserSkills } from "@/lib/types";
 import { toast } from "sonner";
 import { Proficiency } from "@/lib/types";

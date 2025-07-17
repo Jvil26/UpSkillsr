@@ -1,0 +1,49 @@
+# Ignore common development and build-related files/directories
+.git
+.gitignore
+.env
+.DS_Store
+node_modules/
+vendor/
+build/
+dist/
+target/
+logs/
+*.log
+*.tmp
+tmp/
+temp/
+coverage/
+.idea/
+.vscode/
+*.swp
+*.bak
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Ignore Docker-related files if they are not part of the build
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Ignore specific language/framework related files
+# Python
+__pycache__/
+*.pyc
+
+# Node.js
+npm-debug.log
+
+# Java
+pom.xml.tag
+pom.xml.bak
+pom.xml.releaseBackup
+release.properties
+
+# Ruby
+.bundle/
+.ruby-version
+
+# Go
+*.test

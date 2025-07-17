@@ -1,15 +1,16 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { ViewMode } from "@/lib/types";
 import Image from "next/image";
-import { Button } from "./button";
+import { Button } from "../ui/button";
 import { VIEW_MODES } from "@/lib/const";
 import Link from "next/link";
 
 type JournalViewProps = {
   title: string;
   textContent: string;
-  media: string | null | undefined;
+  media: File | string | null | undefined;
   summary: string | null;
   resourceLinks: { type: string; title: string; url: string }[];
   createdAt: string | undefined;
@@ -25,6 +26,27 @@ export default function JournalView({
   resourceLinks,
   createdAt,
 }: JournalViewProps) {
+  const [previewMediaUrl, setPreviewMediaUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!media) {
+      setPreviewMediaUrl(null);
+      return;
+    }
+    if (typeof media == "string") {
+      setPreviewMediaUrl(media);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(media);
+    setPreviewMediaUrl(objectUrl);
+
+    // Cleanup when media changes or component unmounts
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [media]);
+
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto mt-7 border border-border rounded-xl p-6 shadow-xl bg-muted">
       <div className="flex justify-between items-center mb-1">
@@ -41,17 +63,31 @@ export default function JournalView({
       <div>
         <p className="whitespace-pre-wrap leading-relaxed mt-6 font-serif text-[1.05rem]">{textContent}</p>
       </div>
-      {media && (
-        <div>
-          <h2 className="text-xl font-semibold mb-2 underline">Attached Media</h2>
-          {/* Adjust below depending on media type */}
-          <Image src={media} alt="Journal Media" width={800} height={400} className="rounded-lg border" />
-        </div>
-      )}
       {summary && (
         <div className="bg-muted/30 p-4 rounded-md border border-border mt-6 shadow-md">
           <h2 className="text-xl font-semibold mb-1 underline">AI Summary</h2>
           <p className="whitespace-pre-wrap italic text-[0.975rem]">{summary}</p>{" "}
+        </div>
+      )}
+      {previewMediaUrl && (
+        <div>
+          <h2 className="text-xl font-semibold my-3 underline">Attached Media</h2>
+          {previewMediaUrl ? (
+            previewMediaUrl.match(/\.(mp4|webm|ogg)$/i) ? (
+              <video src={previewMediaUrl} controls className="w-full h-64 rounded-md my-3" />
+            ) : (
+              <div className="relative w-full max-w-[800px] h-50 sm:h-100 my-3">
+                <Image
+                  src={previewMediaUrl}
+                  alt="Journal media"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 100vw, 800px"
+                  className="rounded-md object-contain"
+                />
+              </div>
+            )
+          ) : null}
         </div>
       )}
       {resourceLinks.length > 0 && (

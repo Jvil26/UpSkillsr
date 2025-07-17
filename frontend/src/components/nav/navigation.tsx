@@ -7,10 +7,10 @@ import {
   NavigationMenuTrigger,
   NavigationMenuLink,
   NavigationMenuContent,
-} from "./navigation-menu";
-import { Avatar, AvatarImage, AvatarFallback } from "./avatar";
+} from "../ui/navigation-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import Link from "next/link";
-import { Button } from "./button";
+import { Button } from "../ui/button";
 import { signOut } from "aws-amplify/auth";
 import { useAuthContext } from "@/context/auth";
 import { useFetchUser } from "@/hooks/users";
@@ -40,11 +40,11 @@ export default function NavMenu() {
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem></NavigationMenuItem>
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <NavigationMenuLink className="text-2xl font-medium text-black" asChild>
             <Link href="/journals/">Journals</Link>
           </NavigationMenuLink>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
         {loggedIn && (
           <NavigationMenuItem className="flex justify-center items-center relative ml-auto mr-8">
             <NavigationMenuTrigger className="hover:!bg-transparent focus:!bg-transparent dark:!bg-white dark:!text-black">

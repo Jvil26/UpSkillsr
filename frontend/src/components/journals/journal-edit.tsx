@@ -3,14 +3,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import { VIEW_MODES } from "@/lib/const";
 import { ViewMode } from "@/lib/types";
 
 type JournalEditProps = {
   title: string;
   textContent: string;
-  media: string | null | undefined;
   summary: string;
   isGeneratingSummary: boolean;
   resourceLinks: { type: string; title: string; url: string }[];
@@ -29,7 +27,6 @@ type JournalEditProps = {
 export default function JournalEdit({
   title,
   textContent,
-  media,
   summary,
   isGeneratingSummary,
   resourceLinks,
@@ -101,24 +98,6 @@ export default function JournalEdit({
         <div>
           <Label className="pb-1 text-[1.1rem]">Upload Media</Label>
           <Input type="file" id="media" accept="image/*,video/*" onChange={onMediaChange} />
-          <div className="flex justify-center">
-            {media ? (
-              media.match(/\.(mp4|webm|ogg)$/i) ? (
-                <video src={media} controls className="w-full h-64 rounded-md my-3" />
-              ) : (
-                <div className="relative w-full max-w-[800px] h-50 sm:h-100 my-3">
-                  <Image
-                    src={media}
-                    alt="Uploaded media"
-                    fill
-                    priority
-                    sizes="(max-width: 640px) 100vw, 800px"
-                    className="rounded-md object-contain"
-                  />
-                </div>
-              )
-            ) : null}
-          </div>
         </div>
         <div>
           <Label className="pb-1 text-[1.1rem]">Resource Links</Label>

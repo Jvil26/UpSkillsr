@@ -1,17 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useFetchUser } from "@/hooks/users";
-import { Button } from "./button";
-import { Textarea } from "./textarea";
-import { Label } from "./label";
-import { Avatar, AvatarImage, AvatarFallback } from "./avatar";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { formatPhoneNumber } from "@/lib/utils";
 import { toast } from "sonner";
 import { useUpdateUserProfileById, useUpdateUserProfilePic } from "@/hooks/users";
-import { UserProfileSkeleton } from "./user-profile-skeleton";
+import UserProfileSkeleton from "./user-profile-skeleton";
 
 export default function ProfileView() {
-  const { data: user, isFetching: isFetchingUser, isError: isErrorUser } = useFetchUser();
+  const { data: user, isFetching: isFetchingUser, isError: isErrorFetchingUser } = useFetchUser();
   const { mutateAsync: updateUserProfileById, isPending: isSavingProfile } = useUpdateUserProfileById();
   const { mutateAsync: updateUserProfilePic } = useUpdateUserProfilePic();
   //const [userSkills, setUserSkills] = useState<Skills>([]);
@@ -55,22 +55,24 @@ export default function ProfileView() {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (isErrorUser) {
-      toast.error(`Failed to fetch user profile.`);
-    }
-  }, [isErrorUser]);
-
   if (isFetchingUser) {
     return <UserProfileSkeleton />;
   }
 
+  if (isErrorFetchingUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted pt-[calc(var(--nav-height))] p-1 sm:pl-10 sm:pr-7 sm:pb-10">
+        <h1 className="text-[2rem] font-bold">Error fetching user profile. Try Again.</h1>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-evenly items-center p-8 min-h-screen overflow-y-auto sm:flex-row flex-col pt-[calc(var(--nav-height))]">
-      <div className="flex flex-col justify-center items-center gap-y-5 mb-5 w-full">
+      <div className="flex flex-col justify-center items-center gap-y-5 my-5 w-full">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">{user?.username}</h1>
         <Label htmlFor="avatar" className="cursor-pointer justify-center flex-col items-center mb-5">
-          <Avatar className="w-6/10 h-6/10 mt-2 hover:opacity-50">
+          <Avatar className="w-60 h-60 mt-2 hover:opacity-50">
             <AvatarImage src={user?.profile.profile_pic || "https://github.com/shadcn.png"} />
             <AvatarFallback>Profile Image</AvatarFallback>
           </Avatar>

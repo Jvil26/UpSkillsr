@@ -42,8 +42,8 @@ export const PROMPT_LABELS = [
   },
   {
     id: "ai-prompt3",
-    label: "What do you want to improve next week?",
-    placeholder: "List areas you want to strengthen or focus on next week (optional)",
+    label: "What do you still find confusing?",
+    placeholder: "Mention any topics you’re struggling with or want to review again (required)",
   },
 ];
 
