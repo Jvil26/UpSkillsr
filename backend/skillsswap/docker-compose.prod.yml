@@ -8,8 +8,6 @@ services:
     command: >
       sh -c "python manage.py migrate &&
              gunicorn skillsswap.wsgi:application --bind 0.0.0.0:8000"
-    volumes:
-      - .:/app
     ports:
       - "8000:8000"
     env_file:
