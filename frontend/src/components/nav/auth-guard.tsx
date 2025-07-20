@@ -21,7 +21,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (authChecked && !loggedIn && !loading) {
-      console.log("Not Logged In");
       router.push("/sign-in");
     }
   }, [loggedIn, router, authChecked, loading]);
