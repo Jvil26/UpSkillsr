@@ -4,13 +4,13 @@ import { useAuthContext } from "@/context/auth";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useCreateOrFetchUser } from "@/hooks/users";
-import { signInWithRedirect, getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
+import { signInWithRedirect, getCurrentUser, fetchAuthSession, signOut } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 export default function SignIn() {
-  const { login, loggedIn, loading, setLoading } = useAuthContext();
+  const { login, loggedIn, loading, setLoading, logout } = useAuthContext();
   const { mutateAsync: createFetchUser, isError } = useCreateOrFetchUser();
   const router = useRouter();
 
@@ -71,6 +71,8 @@ export default function SignIn() {
     } catch (error) {
       console.error("Error signing in: ", error);
       toast.error("An error occurred signing in. Please try again.");
+      await signOut();
+      logout();
     }
     setLoading(false);
   };
