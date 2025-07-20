@@ -21,7 +21,7 @@ export default function SignIn() {
           await getAuth();
           break;
         case "signInWithRedirect_failure":
-          console.error("An error occurred signing in");
+          console.error("An error occurred signing in", payload.data);
           toast.error("An error occurred signing in. Please try again.");
           break;
       }

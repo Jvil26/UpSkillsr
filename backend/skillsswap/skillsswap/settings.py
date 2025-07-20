@@ -56,7 +56,13 @@ MIDDLEWARE = [
 
 EC2_PRIVATE_IP = os.environ.get("EC2_PRIVATE_IP", "")
 
-ALLOWED_HOSTS = ["localhost", "54.80.161.125", "api.upskillsr.com", EC2_PRIVATE_IP]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "54.80.161.125",
+    "api.upskillsr.com",
+    EC2_PRIVATE_IP,
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
