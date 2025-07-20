@@ -12,10 +12,10 @@ const authConfig: ResourcesConfig = {
           domain: process.env.NEXT_PUBLIC_AWS_DOMAIN as string,
           scopes: ["openid", "email", "phone", "profile", "aws.cognito.signin.user.admin"],
           redirectSignIn: isProd
-            ? ["https://main.dwvxczjg8uzxn.amplifyapp.com", "https://upskillsr.com", "https://www.upskillsr.com"]
+            ? ["https://main.dgfk080rjb6g.amplifyapp.com", "https://upskillsr.com", "https://www.upskillsr.com"]
             : ["http://localhost:3000"],
           redirectSignOut: isProd
-            ? ["https://main.dwvxczjg8uzxn.amplifyapp.com", "https://upskillsr.com", "https://www.upskillsr.com"]
+            ? ["https://main.dgfk080rjb6g.amplifyapp.com", "https://upskillsr.com", "https://www.upskillsr.com"]
             : ["http://localhost:3000"],
           responseType: "code",
         },
