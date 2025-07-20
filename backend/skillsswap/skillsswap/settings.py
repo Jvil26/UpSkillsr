@@ -21,13 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-z418buk%&(cc=@stew6q6u61gb-63q^5r(j2ad71u2s3dbf@m_"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() == "true"
 
 # Application definition
 
@@ -57,7 +54,16 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+EC2_PRIVATE_IP = os.environ.get("EC2_PRIVATE_IP", "")
+
+ALLOWED_HOSTS = ["localhost", "54.80.161.125", "api.upskillsr.com", EC2_PRIVATE_IP]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://main.dwvxczjg8uzxn.amplifyapp.com",
+    "https://upskillsr.com",
+    "https://www.upskillsr.com",
+]
 
 ROOT_URLCONF = "skillsswap.urls"
 
