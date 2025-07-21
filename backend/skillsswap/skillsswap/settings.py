@@ -59,14 +59,19 @@ EC2_PRIVATE_IP = os.environ.get("EC2_PRIVATE_IP", "")
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "54.80.161.125",
+    "upskillsr.com",
+    "www.upskillsr.com",
     "api.upskillsr.com",
+    "ec2-3-232-238-67.compute-1.amazonaws.com",
+    "3.232.238.67",
+    "52.5.214.233",
     EC2_PRIVATE_IP,
 ]
 
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://main.dwvxczjg8uzxn.amplifyapp.com",
+    "https://main.dgfk080rjb6g.amplifyapp.com",
     "https://upskillsr.com",
     "https://www.upskillsr.com",
 ]

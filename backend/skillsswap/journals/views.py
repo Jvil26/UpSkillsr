@@ -285,8 +285,8 @@ def build_llm_journal_prompt(prompts):
 
 
 def token_count(input):
+    total_tokens = 0
     if isinstance(input, list):
-        total_tokens = 0
         for object in input:
             if isinstance(object["question"], str):
                 total_tokens += len(encoding.encode(object["question"]))
