@@ -36,7 +36,7 @@ export default function NavMenu() {
             className="text-3xl mr-10 font-bold dark:text-black dark:hover:text-white dark:focus:text-white"
             asChild
           >
-            <Link href="/">SkillLog</Link>
+            <Link href="/">UpSkillsr</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem></NavigationMenuItem>

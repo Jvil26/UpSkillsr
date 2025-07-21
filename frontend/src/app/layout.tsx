@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkillsLog",
+  title: "UpSkillsr",
   description: "Track and showcase your skill development with journals, videos, and progress logs.",
 };
 
