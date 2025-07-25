@@ -2,7 +2,6 @@ from rest_framework import serializers
 from users.models import User, UserProfile, UserSkill
 from skills.serializers import SkillSerializer
 from skills.models import Skill
-from journals.serializers import JournalSerializer
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

@@ -7,9 +7,29 @@ import {
   ResourceLink,
   PaginatedJournals,
   paginatedJournalsSchema,
+  Filters,
 } from "@/lib/types";
 import { z } from "zod";
 import { fetchWithAuth } from "@/lib/utils";
+
+export async function fetchAllJournals(page: number, filters: Filters): Promise<PaginatedJournals | undefined> {
+  try {
+    const searchParams = new URLSearchParams({ page: String(page), ...filters });
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/?${searchParams}`);
+    const resJSON = await res.json();
+
+    if (!res.ok) {
+      throw new Error(JSON.stringify(resJSON));
+    }
+
+    const validatedJournalsJSON = paginatedJournalsSchema.parse(resJSON);
+    console.log(validatedJournalsJSON);
+    return validatedJournalsJSON;
+  } catch (error) {
+    console.error("Failed to fetch journals", error);
+    throw new Error();
+  }
+}
 
 export async function fetchJournalById(id: number): Promise<Journal | undefined> {
   try {
@@ -23,29 +43,38 @@ export async function fetchJournalById(id: number): Promise<Journal | undefined>
     return validatedJournalJSON;
   } catch (error) {
     console.error(`Failed to fetch journal by id: ${id}`, error);
+    throw new Error();
   }
 }
 
-export async function fetchJournalsByUserSkillId(id: number, page: number): Promise<PaginatedJournals | undefined> {
+export async function fetchJournalsByUserSkillId(
+  id: number,
+  page: number,
+  filters: Filters
+): Promise<PaginatedJournals | undefined> {
   try {
+    const searchParams = new URLSearchParams({ page: String(page), ...filters });
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/user-skill/${id}/?page=${page}`
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/user-skill/${id}/?${searchParams}`
     );
     const resJSON = await res.json();
 
     if (!res.ok) {
-      throw new Error(JSON.stringify(resJSON));
+      throw new Error(`Failed to fetch journals: ${JSON.stringify(resJSON)}`);
     }
+
     const validatedJournalsJSON = paginatedJournalsSchema.parse(resJSON);
     console.log(validatedJournalsJSON);
     return validatedJournalsJSON;
   } catch (error) {
     console.error(`Failed to fetch journal by id: ${id}`, error);
+    throw error;
   }
 }
 
 export async function createJournal(journalData: FormData): Promise<Journal | undefined> {
   try {
+    console.log(Object.fromEntries(journalData.entries()));
     const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/`, {
       method: "POST",
       body: journalData,

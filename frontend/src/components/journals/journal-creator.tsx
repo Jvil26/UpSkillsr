@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import JournalView from "./journal-view";
 import JournalAIInputPanel from "./journal-ai-input-panel";
 import { Button } from "../ui/button";
@@ -27,6 +27,7 @@ type JournalCreatorProps = {
 
 export default function JournalCreator({ isNew, journalId, userSkillId }: JournalCreatorProps) {
   const router = useRouter();
+  const pathName = usePathname();
   const searchParams = useSearchParams();
   const {
     data: journal,
@@ -75,7 +76,9 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
 
   const handleViewChange = (viewMode: ViewMode) => {
     setViewMode(viewMode);
-    router.replace(`/skills/${userSkillId}/journals/${isNew ? "new" : journalId}?viewMode=${viewMode}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("viewMode", viewMode);
+    router.replace(`${pathName}?${params.toString()}`);
   };
 
   const handlePromptInputChange = (id: string, value: string) => {
@@ -111,7 +114,7 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
         return;
       }
       const formData = new FormData();
-      formData.append("user_skill", String(userSkillId));
+      formData.append("user_skill_id", String(userSkillId));
       formData.append("title", title);
       formData.append("text_content", textContent);
       formData.append("summary", summary);
