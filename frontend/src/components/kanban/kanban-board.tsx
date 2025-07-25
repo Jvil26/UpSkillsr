@@ -1,6 +1,6 @@
 "use client";
 import KanbanColumn from "./kanban-column";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SkillCard } from "@/components/ui/skill-card";
 import { PROFIENCIES } from "@/lib/const";
 import {
@@ -12,18 +12,16 @@ import {
   PointerSensor,
   useSensor,
 } from "@dnd-kit/core";
-import { UserSkills, Proficiency, UserSkill, Skills, UserSkillPayload } from "@/lib/types";
-import { useUpdateUserSkillById } from "@/hooks/users";
+import { Proficiency, UserSkill, UserSkillPayload } from "@/lib/types";
+import { useUpdateUserSkillById, useFetchUserSkills } from "@/hooks/users";
+import { useFetchAllSkills } from "@/hooks/skills";
 import { useAuthContext } from "@/context/auth";
 
-type KanbanBoardProps = {
-  userSkills: UserSkills;
-  availableSkills: Skills;
-};
-
-export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoardProps) {
+export default function KanbanBoard() {
   const { mutateAsync: updateUserSkillbyId } = useUpdateUserSkillById();
-  const [usrSkills, setUserSkills] = useState<UserSkills>(userSkills);
+  const { data: userSkills, isError: isErrorFetchingUserSkills } = useFetchUserSkills();
+  const { data: allSkills, isError: isErrorFetchingAllSkills } = useFetchAllSkills();
+
   const [draggedWidth, setDraggedWidth] = useState<number | undefined>(undefined);
   const [activeSkill, setActiveSkill] = useState<UserSkill | null>(null);
   const { user } = useAuthContext();
@@ -40,7 +38,7 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
     const { active, over } = e;
     if (over && over.id && user?.username) {
       let newUserSkillData: UserSkillPayload | null = null;
-      const newUserSkills = userSkills.map((us) => {
+      userSkills?.map((us) => {
         if (us.id === active.id && us.proficiency !== over?.id) {
           us.proficiency = over.id as Proficiency;
           newUserSkillData = {
@@ -53,7 +51,6 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
       });
 
       if (newUserSkillData) {
-        setUserSkills(newUserSkills);
         await updateUserSkillbyId({ id: Number(active.id), data: newUserSkillData });
       }
     }
@@ -62,7 +59,7 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
   };
 
   function handleDragStart(event: DragStartEvent) {
-    const skill = userSkills.find((s) => s.id === event.active.id);
+    const skill = userSkills?.find((s) => s.id === event.active.id);
     setActiveSkill(skill ?? null);
     const el = document.getElementById(`skill-card-${event.active.id.toString()}`);
     if (el) {
@@ -71,11 +68,13 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
     }
   }
 
-  useEffect(() => {
-    if (userSkills) {
-      setUserSkills(userSkills);
-    }
-  }, [userSkills]);
+  if (isErrorFetchingAllSkills || isErrorFetchingUserSkills) {
+    return (
+      <div className="min-h-screen pt-[calc(var(--nav-height))] flex justify-center items-center p-1 sm:pl-10 sm:pr-7 sm:pb-10">
+        <h1 className="text-[2rem] font-bold">Error fetching from server. Try Again.</h1>
+      </div>
+    );
+  }
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors}>
@@ -85,8 +84,8 @@ export default function KanbanBoard({ userSkills, availableSkills }: KanbanBoard
             key={`kanban-column-${level}`}
             level={level}
             droppableId={level}
-            userSkills={usrSkills.filter((userSkill) => userSkill.proficiency === level)}
-            availableSkills={availableSkills}
+            userSkills={userSkills ? userSkills.filter((userSkill) => userSkill.proficiency === level) : []}
+            availableSkills={allSkills?.filter((skill) => !userSkills?.some((us) => us.skill.id === skill.id)) ?? []}
           />
         ))}
       </div>

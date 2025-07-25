@@ -146,11 +146,11 @@ export function useDeleteUserSkillById(): UseMutationResult<number | undefined, 
   });
 }
 
-export function useFetchUserSkillById(id: number): UseQueryResult<UserSkill | undefined> {
+export function useFetchUserSkillById(id: number | undefined): UseQueryResult<UserSkill | undefined> {
   return useQuery({
     queryKey: ["userSkill", id],
     queryFn: () => fetchUserSkillById(id!),
-    enabled: !!id,
+    enabled: typeof id === "number",
     staleTime: 1000 * 60 * 5,
   });
 }

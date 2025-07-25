@@ -31,7 +31,7 @@ async function getJWTToken(): Promise<string | undefined> {
     return session?.tokens?.accessToken.toString();
   } catch (error) {
     console.error("Failed to fetch jwt token", error);
-    return undefined;
+    throw new Error("Failed to fetch jwt token");
   }
 }
 

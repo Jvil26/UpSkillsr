@@ -15,7 +15,6 @@ urlpatterns = [
         views.journals_by_user_skill,
         name="journals-by-user-skill",
     ),
-    path("user/<str:username>/", views.journals_by_user, name="journals-by-user"),
     path("generate-journal/", views.generate_journal, name="generate-journal"),
     path(
         "generate-summary/",

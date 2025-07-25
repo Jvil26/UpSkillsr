@@ -40,11 +40,11 @@ export default function NavMenu() {
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem></NavigationMenuItem>
-        {/* <NavigationMenuItem>
+        <NavigationMenuItem>
           <NavigationMenuLink className="text-2xl font-medium text-black" asChild>
             <Link href="/journals/">Journals</Link>
           </NavigationMenuLink>
-        </NavigationMenuItem> */}
+        </NavigationMenuItem>
         {loggedIn && (
           <NavigationMenuItem className="flex justify-center items-center relative ml-auto mr-8">
             <NavigationMenuTrigger className="hover:!bg-transparent focus:!bg-transparent dark:!bg-white dark:!text-black">
