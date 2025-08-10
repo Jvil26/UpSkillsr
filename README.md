@@ -31,4 +31,4 @@ Check it out: https://www.upskillsr.com/
 - **AWS Cognito** – Authentication
 - **AWS S3** – Media Storage
 - **AWS RDS** – PostgreSQL Database
-- **Anthropic API** – AI Summary Generation
+- **Anthropic API** – AI Journal and Journal Summary Generation
