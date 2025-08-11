@@ -1,7 +1,7 @@
 import { JournalCreator } from "@/components/journals";
 
-export default async function JournalPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug: journalId } = await params;
+export default async function JournalPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: journalId } = await params;
 
   const isNew = journalId === "new";
 

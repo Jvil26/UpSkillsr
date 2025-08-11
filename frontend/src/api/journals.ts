@@ -27,7 +27,7 @@ export async function fetchAllJournals(page: number, filters: Filters): Promise<
     return validatedJournalsJSON;
   } catch (error) {
     console.error("Failed to fetch journals", error);
-    throw new Error();
+    throw error;
   }
 }
 
@@ -74,7 +74,6 @@ export async function fetchJournalsByUserSkillId(
 
 export async function createJournal(journalData: FormData): Promise<Journal | undefined> {
   try {
-    console.log(Object.fromEntries(journalData.entries()));
     const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/`, {
       method: "POST",
       body: journalData,

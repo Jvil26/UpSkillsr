@@ -75,11 +75,7 @@ export function useCreateJournal(): UseMutationResult<Journal | undefined, Error
       if (newJournal) {
         queryClient.invalidateQueries({
           predicate: (query) => {
-            return (
-              Array.isArray(query.queryKey) &&
-              query.queryKey[0] === "paginatedJournals" &&
-              query.queryKey[1] == newJournal.user_skill.id
-            );
+            return Array.isArray(query.queryKey) && query.queryKey[0] === "paginatedJournals";
           },
         });
         queryClient.setQueryData(["journal", newJournal.id], newJournal);
@@ -94,8 +90,6 @@ export function useUpdateJournalById(): UseMutationResult<
   { id: number; journalData: FormData }
 > {
   const queryClient = useQueryClient();
-  const { user } = useAuthContext();
-  const username = user?.username;
 
   return useMutation({
     mutationFn: updateJournalById,
@@ -104,11 +98,7 @@ export function useUpdateJournalById(): UseMutationResult<
         queryClient.setQueriesData(
           {
             predicate: (query) => {
-              return (
-                Array.isArray(query.queryKey) &&
-                query.queryKey[0] === "paginatedJournals" &&
-                (query.queryKey[1] == updatedJournal.user_skill.id || query.queryKey[1] == username)
-              );
+              return Array.isArray(query.queryKey) && query.queryKey[0] === "paginatedJournals";
             },
           },
           (pageData: PaginatedJournals | undefined) => {
@@ -128,12 +118,8 @@ export function useUpdateJournalById(): UseMutationResult<
   });
 }
 
-export function useDeleteJournalById(
-  userSkillId: number | undefined
-): UseMutationResult<number | undefined, Error, number> {
+export function useDeleteJournalById(): UseMutationResult<number | undefined, Error, number> {
   const queryClient = useQueryClient();
-  const { user } = useAuthContext();
-  const username = user?.username;
 
   return useMutation({
     mutationFn: deleteJournalById,
@@ -141,12 +127,7 @@ export function useDeleteJournalById(
       if (deletedId) {
         queryClient.invalidateQueries({
           predicate: (query) => {
-            return (
-              (Array.isArray(query.queryKey) &&
-                query.queryKey[0] === "paginatedJournals" &&
-                query.queryKey[1] == userSkillId) ||
-              query.queryKey[1] == username
-            );
+            return Array.isArray(query.queryKey) && query.queryKey[0] === "paginatedJournals";
           },
         });
       }

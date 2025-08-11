@@ -54,7 +54,7 @@ export default function JournalList({ userSkillId, initialPage = 1 }: JournalsLi
   const isError = isErrorBySkill || isErrorAll;
   const error = errorBySkill || errorAll;
 
-  const { mutate: deleteJournalById } = useDeleteJournalById(userSkillId);
+  const { mutate: deleteJournalById } = useDeleteJournalById();
 
   const handleFilterChange = (updated: Partial<Filters>) => {
     setFilters((prev) => {
@@ -119,7 +119,7 @@ export default function JournalList({ userSkillId, initialPage = 1 }: JournalsLi
             className="border rounded-xl bg-card p-2 sm:p-4 shadow-sm"
           >
             <AccordionTrigger className="flex-col sm:flex-row justify-between items-center cursor-pointer hover:no-underline gap-y-4 sm:gap-y-10 md:py-1 lg:py-4 py-2">
-              <span className="text-left text-[1.5rem] font-bold font-serif">{journal.title}</span>
+              <span className="text-left text-[1.2rem] font-bold font-serif">{journal.title.slice(0, 40)}</span>
               <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:mt-0 sm:ml-auto">
                 <Badge
                   variant="outline"

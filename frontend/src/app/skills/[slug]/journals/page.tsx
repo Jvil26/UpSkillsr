@@ -5,7 +5,7 @@ export default async function SkillJournalsPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ slug: number }>;
+  params: Promise<{ slug: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug: userSkillId } = await params;

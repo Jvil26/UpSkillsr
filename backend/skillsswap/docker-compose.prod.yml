@@ -6,7 +6,8 @@ services:
         ENV: production
     restart: always
     command: >
-      sh -c "python manage.py migrate &&
+      sh -c "python manage.py makemigrations && 
+             python manage.py migrate &&
              gunicorn skillsswap.wsgi:application --bind 0.0.0.0:8000"
     expose:
       - "8000"
