@@ -51,6 +51,8 @@ export const userSkillSchema = z.object({
   updated_at: z.string().datetime(),
 });
 
+export const userSkillsSchema = z.array(userSkillSchema);
+
 export const journalSchema = z.object({
   id: z.number(),
   user_skill: userSkillSchema,
@@ -77,8 +79,6 @@ export const paginatedJournalsSchema = z.object({
   total: z.number(),
   results: journalsSchema,
 });
-
-export const userSkillsSchema = z.array(userSkillSchema);
 
 export const userProfileSchema = z.object({
   id: z.number(),

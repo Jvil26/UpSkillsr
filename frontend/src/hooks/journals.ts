@@ -160,13 +160,9 @@ export function useGenerateJournalSummary(): UseMutationResult<string, Error, st
   });
 }
 
-export function useGenerateJournal(): UseMutationResult<
-  Partial<Journal>,
-  Error,
-  { prompts: Prompts; userSkillId: number }
-> {
+export function useGenerateJournal(): UseMutationResult<Partial<Journal>, Error, Prompts> {
   return useMutation({
-    mutationFn: ({ userSkillId, prompts }) => generateJournal(userSkillId, prompts),
+    mutationFn: generateJournal,
   });
 }
 

@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1
 # Set working directory
 WORKDIR /app
 
-# Accept build-time environment (default to prod)
+# Accept build-time environment (default to dev)
 ARG ENV=development
 ENV ENV=$ENV
 

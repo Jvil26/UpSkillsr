@@ -57,15 +57,28 @@ export default function JournalList({ userSkillId, initialPage = 1 }: JournalsLi
   const { mutate: deleteJournalById } = useDeleteJournalById(userSkillId);
 
   const handleFilterChange = (updated: Partial<Filters>) => {
-    setFilters((prev) => ({ ...prev, ...updated }));
+    setFilters((prev) => {
+      const newFilters = { ...prev, ...updated };
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [type, val] of Object.entries(newFilters)) {
+        if (val) {
+          params.set(type, val);
+        } else {
+          params.delete(type);
+        }
+      }
+      router.replace(`${pathName}?${params.toString()}`);
+
+      return newFilters;
+    });
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
-    const paramsString = newPage > 1 ? `?${params.toString()}` : "";
-    router.push(`${pathName}${paramsString}`);
+    const paramsString = newPage > 1 ? params.toString() : "";
+    router.push(`${pathName}?${paramsString}`);
   };
 
   const handleDelete = (id: number) => {
@@ -92,67 +105,64 @@ export default function JournalList({ userSkillId, initialPage = 1 }: JournalsLi
   }
 
   return (
-    <div className="min-h-screen h-auto bg-muted py-[calc(var(--nav-height))] px-35">
+    <div className="min-h-screen h-auto bg-muted py-[calc(var(--nav-height))] lg:px-35 px-2 sm:px-5">
       <h1 className="text-[3rem] font-bold text-center underline underline-offset-12 my-6">
         {userSkill?.skill.name} Journals
       </h1>
       <JournalFilters filters={filters} onChange={handleFilterChange} />
-      <Accordion type="multiple" className="bg-muted py-5 flex flex-col gap-8">
+      {journals?.total === 0 && <h1 className="text-[2rem] font-bold my-8 text-center">No Results Found.</h1>}
+      <Accordion type="multiple" className="bg-muted py-5 flex flex-col gap-5">
         {journals?.results.map((journal) => (
           <AccordionItem
             key={journal.id}
             value={`journal-${journal.id}`}
-            className="border rounded-xl bg-card p-4 shadow-sm"
+            className="border rounded-xl bg-card p-2 sm:p-4 shadow-sm"
           >
-            <AccordionTrigger className="flex-col sm:flex-row justify-between items-center cursor-pointer hover:no-underline">
-              <span className="text-left text-xl font-bold">{journal.title}</span>
-              <div className="sm:ml-auto flex flex-col sm:flex-row items-center">
-                <div className="flex flex-col sm:flex-row gap-y-10 mr-6 gap-x-2">
-                  <Badge
-                    variant="outline"
-                    className={`${
-                      LEVEL_BG_COLORS[journal.user_skill.proficiency]
-                    } w-27 h-8 text-[0.83rem] rounded-full bg-gray-700 hover:bg-gray-600`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/skills/${journal.user_skill.id}/journals`);
-                    }}
-                  >
-                    {journal.user_skill.skill.name}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className={`${
-                      CATEGORY_BG_COLORS[journal.user_skill.skill.category]
-                    } w-27 h-8 text-[0.83rem] rounded-full`}
-                  >
-                    {journal.user_skill.skill.category}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className={`${
-                      LEVEL_BG_COLORS[journal.user_skill.proficiency]
-                    } w-27 h-8 text-[0.83rem] rounded-full`}
-                  >
-                    {journal.user_skill.proficiency}
-                  </Badge>
-                </div>
-                <span className="text-sm font-bold">
-                  Created:{" "}
-                  {new Date(journal.created_at).toLocaleString([], {
-                    month: "numeric",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
+            <AccordionTrigger className="flex-col sm:flex-row justify-between items-center cursor-pointer hover:no-underline gap-y-4 sm:gap-y-10 md:py-1 lg:py-4 py-2">
+              <span className="text-left text-[1.5rem] font-bold font-serif">{journal.title}</span>
+              <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:mt-0 sm:ml-auto">
+                <Badge
+                  variant="outline"
+                  className={`${
+                    LEVEL_BG_COLORS[journal.user_skill.proficiency]
+                  } w-27 h-8 text-[0.83rem] rounded-full bg-gray-700 hover:bg-gray-600`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/skills/${journal.user_skill.id}/journals`);
+                  }}
+                >
+                  {journal.user_skill.skill.name}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className={`${
+                    CATEGORY_BG_COLORS[journal.user_skill.skill.category]
+                  } w-27 h-8 text-[0.83rem] rounded-full`}
+                >
+                  {journal.user_skill.skill.category}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className={`${LEVEL_BG_COLORS[journal.user_skill.proficiency]} w-27 h-8 text-[0.83rem] rounded-full`}
+                >
+                  {journal.user_skill.proficiency}
+                </Badge>
               </div>
+              <span className="text-sm font-bold">
+                Created:{" "}
+                {new Date(journal.created_at).toLocaleString([], {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-5 pb-2">
               <div className="bg-muted/30 p-4 rounded-md border border-border mt-2 shadow-md">
                 <h2 className="text-xl font-semibold mb-1 underline">AI Summary</h2>
-                <p className="whitespace-pre-wrap italic text-[0.975rem]">{journal.summary}</p>
+                <p className="whitespace-pre-wrap font-serif text-[0.975rem]">{journal.summary}</p>
               </div>
               <div className="flex gap-2 mt-2">
                 <Button
