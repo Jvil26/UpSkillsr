@@ -4,7 +4,7 @@ import { JournalList } from "@/components/journals";
 export default async function JournalsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const sp = await searchParams;
   const pageNumber = Number(sp.page);
