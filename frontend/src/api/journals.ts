@@ -15,7 +15,7 @@ import { fetchWithAuth } from "@/lib/utils";
 export async function fetchAllJournals(page: number, filters: Filters): Promise<PaginatedJournals | undefined> {
   try {
     const searchParams = new URLSearchParams({ page: String(page), ...filters });
-    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/?${searchParams}`);
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/?${searchParams.toString()}`);
     const resJSON = await res.json();
 
     if (!res.ok) {
@@ -55,7 +55,7 @@ export async function fetchJournalsByUserSkillId(
   try {
     const searchParams = new URLSearchParams({ page: String(page), ...filters });
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/user-skill/${id}/?${searchParams}`
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/user-skill/${id}/?${searchParams.toString()}`
     );
     const resJSON = await res.json();
 
@@ -160,11 +160,11 @@ export async function generateJournalSummary(textContent: string): Promise<strin
   }
 }
 
-export async function generateJournal(userSkillId: number, prompts: Prompts): Promise<Partial<Journal>> {
+export async function generateJournal(prompts: Prompts): Promise<Partial<Journal>> {
   try {
     const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/journals/generate-journal/`, {
       method: "POST",
-      body: JSON.stringify({ userSkillId, prompts }),
+      body: JSON.stringify({ prompts }),
       headers: {
         "Content-type": "application/json",
       },

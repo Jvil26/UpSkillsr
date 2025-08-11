@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SkillCard } from "@/components/ui/skill-card";
 import { Droppable } from "../ui/droppable";
 import { UserSkillDialog } from "../ui/user-skill-dialog";
-import { Skill, Skills, UserSkills } from "@/lib/types";
+import { Skills, UserSkills } from "@/lib/types";
 import { toast } from "sonner";
 import { Proficiency } from "@/lib/types";
 import { useCreateUserSkill } from "@/hooks/users";
@@ -20,24 +20,28 @@ type KanbanColumnProps = {
 export default function KanbanColumn({ level, droppableId, userSkills, availableSkills }: KanbanColumnProps) {
   const { mutateAsync: createUserSkill } = useCreateUserSkill();
   const [open, setOpen] = useState(false);
-  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [selectedSkillId, setSelectedSkillId] = useState<number | null>(null);
   const [proficiency, setProficiency] = useState<Proficiency>(level);
   const { user } = useAuthContext();
 
   const handleCreateUserSkill = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      if (!selectedSkill) {
+      if (!selectedSkillId) {
         toast.error("Failed to create user skill. Please select a skill.");
         return;
       }
 
       if (user?.username) {
-        await createUserSkill({ user_id: user.username, skill_id: selectedSkill.id, proficiency: proficiency });
+        const newUserSkill = await createUserSkill({
+          user_id: user.username,
+          skill_id: selectedSkillId,
+          proficiency: proficiency,
+        });
         setOpen(false);
-        setSelectedSkill(null);
+        setSelectedSkillId(null);
         setProficiency(level);
-        toast.success(`Successfully created: ${selectedSkill.name} ${proficiency}`);
+        toast.success(`Successfully created: ${newUserSkill?.skill.name} ${proficiency}`);
       } else {
         toast.error("Could not find user.");
       }
@@ -57,7 +61,7 @@ export default function KanbanColumn({ level, droppableId, userSkills, available
 
   const handleCloseDialog = () => {
     setOpen(false);
-    setSelectedSkill(null);
+    setSelectedSkillId(null);
     setProficiency(level);
   };
 
@@ -67,8 +71,8 @@ export default function KanbanColumn({ level, droppableId, userSkills, available
         {level}
         <UserSkillDialog
           onSubmit={handleCreateUserSkill}
-          selectedSkill={selectedSkill}
-          setSelectedSkill={setSelectedSkill}
+          selectedSkillId={selectedSkillId}
+          setSelectedSkillId={setSelectedSkillId}
           level={proficiency}
           setProficiency={setProficiency}
           open={open}

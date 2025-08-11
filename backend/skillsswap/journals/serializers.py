@@ -9,6 +9,15 @@ class ResourceLinkSerializer(serializers.ModelSerializer):
         model = ResourceLink
         fields = "__all__"
 
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            fields["journal"].queryset = Journal.objects.filter(
+                user_skill__user__username=request.user.username
+            )
+        return fields
+
 
 class JournalSerializer(serializers.ModelSerializer):
     resource_links = ResourceLinkSerializer(many=True, read_only=True)
@@ -32,3 +41,12 @@ class JournalSerializer(serializers.ModelSerializer):
             "updated_at",
             "created_at",
         ]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            fields["user_skill_id"].queryset = UserSkill.objects.filter(
+                user__username=request.user.username
+            )
+        return fields

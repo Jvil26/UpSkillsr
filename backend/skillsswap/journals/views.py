@@ -19,7 +19,7 @@ MAX_INPUT_TOKEN_LEN = 2000
 @api_view(["GET", "POST"])
 def journals_list(request):
     """
-    List all journals by username, or create a journal.
+    List all journals for a user by their username, or create a journal.
     """
     if request.method == "GET":
         user = request.user
@@ -33,9 +33,9 @@ def journals_list(request):
         search = request.GET.get("search")
 
         if search:
-            journals = journals.filter(title__icontains=search)
+            journals = journals.filter(title__icontains=search.strip())
         if proficiency:
-            journals = journals.filter(user_skill__proficiency=proficiency)
+            journals = journals.filter(user_skill__proficiency=proficiency.strip())
         if sort == "asc":
             journals = journals.order_by("title")
         elif sort == "desc":
@@ -48,12 +48,13 @@ def journals_list(request):
         pagination = JournalPagination()
         results_page = pagination.paginate_queryset(journals, request)
 
-        serializer = JournalSerializer(results_page, many=True)
+        serializer = JournalSerializer(
+            results_page, many=True, context={"request": request}
+        )
         return pagination.get_paginated_response(serializer.data)
 
     elif request.method == "POST":
-        print(request.data)
-        serializer = JournalSerializer(data=request.data)
+        serializer = JournalSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -69,11 +70,13 @@ def journals_detail(request, pk):
     journal = get_object_or_404(Journal, pk=pk)
 
     if request.method == "GET":
-        serializer = JournalSerializer(journal)
+        serializer = JournalSerializer(journal, context={"request": request})
         return Response(serializer.data)
 
     elif request.method == "PUT":
-        serializer = JournalSerializer(journal, data=request.data)
+        serializer = JournalSerializer(
+            journal, data=request.data, context={"request": request}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -99,9 +102,9 @@ def journals_by_user_skill(request, user_skill_id):
     search = request.GET.get("search")
 
     if search:
-        journals = journals.filter(title__icontains=search)
+        journals = journals.filter(title__icontains=search.strip())
     if proficiency:
-        journals = journals.filter(user_skill__proficiency=proficiency)
+        journals = journals.filter(user_skill__proficiency=proficiency.strip())
     if sort == "asc":
         journals = journals.order_by("title")
     elif sort == "desc":
@@ -113,18 +116,23 @@ def journals_by_user_skill(request, user_skill_id):
 
     pagination = JournalPagination()
     result_page = pagination.paginate_queryset(journals, request)
-    serializer = JournalSerializer(result_page, many=True)
+    serializer = JournalSerializer(result_page, many=True, context={"request": request})
     return pagination.get_paginated_response(serializer.data)
 
 
 @api_view(["GET", "POST"])
 def resource_links_list(request):
     if request.method == "GET":
-        serializer = ResourceLinkSerializer(request.data)
+        resource_links = ResourceLink.objects.all()
+        serializer = ResourceLinkSerializer(
+            resource_links, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
     elif request.method == "POST":
-        serializer = ResourceLinkSerializer(request.data)
+        serializer = ResourceLinkSerializer(
+            data=request.data, context={"request": request}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -136,11 +144,13 @@ def resource_links_detail(request, pk):
     resource_link = get_object_or_404(ResourceLink, pk=pk)
 
     if request.method == "GET":
-        serializer = ResourceLinkSerializer(resource_link)
+        serializer = ResourceLinkSerializer(resource_link, context={"request": request})
         return Response(serializer.data)
 
     elif request.method == "PUT":
-        serializer = ResourceLinkSerializer(request.data)
+        serializer = ResourceLinkSerializer(
+            resource_link, data=request.data, context={"request": request}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -171,7 +181,9 @@ def resource_links_batch(request, journalId):
         else:
             ResourceLink.objects.create(journal=journal, **link_data)
 
-    serializer = ResourceLinkSerializer(journal.resource_links.all(), many=True)
+    serializer = ResourceLinkSerializer(
+        journal.resource_links.all(), many=True, context={"request": request}
+    )
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 

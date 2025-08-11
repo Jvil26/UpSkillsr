@@ -47,19 +47,16 @@ type JournalFilterProps = {
 
 export default function JournalFilters({ filters, onChange }: JournalFilterProps) {
   return (
-    <div className="flex bg-card mt-10 mb-5 p-3 items-center justify-between">
+    <div className="flex bg-card mt-7 mb-5 p-3 items-center justify-between">
       <SearchBar value={filters.search} onChange={(val: string) => onChange({ search: val })} />
       <div className="flex ml-auto items-center">
         <ProficiencyFilter
           value={filters.proficiency}
           onChange={(val: string) => {
-            onChange({ proficiency: val === filters.proficiency ? "" : val });
+            onChange({ proficiency: val });
           }}
         />
-        <SortFilter
-          value={filters.sort}
-          onChange={(val: string) => onChange({ sort: val === filters.sort ? "" : val })}
-        />
+        <SortFilter value={filters.sort} onChange={(val: string) => onChange({ sort: val })} />
         <ResetFilters onChange={() => onChange({ sort: "newest_to_oldest", proficiency: "", search: "" })} />
       </div>
     </div>
