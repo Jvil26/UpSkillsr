@@ -12,7 +12,7 @@ import json
 
 client = anthropic.Anthropic()
 encoding = tiktoken.get_encoding("cl100k_base")
-MAX_INPUT_TOKEN_LEN = 2000
+MAX_INPUT_TOKEN_LEN = 4000
 
 
 # Create your views here.
