@@ -3,14 +3,38 @@ import {
   batchUpdateResourceLinks,
   createJournal,
   deleteJournalById,
+  fetchAllJournals,
   fetchJournalById,
   fetchJournalsByUserSkillId,
   generateJournal,
   generateJournalSummary,
   updateJournalById,
 } from "@/api/journals";
-import { Journal, PaginatedJournals, Prompts, ResourceLink, ResourceLinks } from "@/lib/types";
+import { Filters, Journal, PaginatedJournals, Prompts, ResourceLink, ResourceLinks } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuthContext } from "@/context/auth";
+
+export function useFetchAllJournals(
+  page: number,
+  filters: Filters,
+  options?: { enabled?: boolean }
+): UseQueryResult<PaginatedJournals | undefined> {
+  const { user } = useAuthContext();
+  const username = user?.username;
+
+  return useQuery({
+    queryKey: ["paginatedJournals", username, page, filters.search, filters.proficiency, filters.sort],
+    queryFn: () => fetchAllJournals(page, filters),
+    enabled: options?.enabled ?? false,
+    staleTime: 1000 * 60 * 5,
+    retry: (failureCount, error) => {
+      if (error instanceof Error && error.message.includes("Invalid page")) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+  });
+}
 
 export function useFetchJournalById(id: number, options?: { enabled?: boolean }): UseQueryResult<Journal | undefined> {
   return useQuery({
@@ -21,12 +45,24 @@ export function useFetchJournalById(id: number, options?: { enabled?: boolean })
   });
 }
 
-export function useFetchJournalsByUserSkillId(id: number, page: number): UseQueryResult<PaginatedJournals | undefined> {
+export function useFetchJournalsByUserSkillId(
+  id: number | undefined,
+  page: number,
+  filters: Filters
+): UseQueryResult<PaginatedJournals | undefined> {
   return useQuery({
-    queryKey: !!id ? ["paginatedJournals", id, page] : ["paginatedJournals", page],
-    queryFn: () => fetchJournalsByUserSkillId(id!, page),
-    enabled: !!id,
+    queryKey: !!id
+      ? ["paginatedJournals", id, page, filters.search, filters.proficiency, filters.sort]
+      : ["paginatedJournals", page, filters.search, filters.proficiency, filters.sort],
+    queryFn: () => fetchJournalsByUserSkillId(id!, page, filters),
+    enabled: typeof id === "number",
     staleTime: 1000 * 60 * 5,
+    retry: (failureCount, error) => {
+      if (error instanceof Error && error.message.includes("Invalid page")) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 }
 
@@ -42,7 +78,7 @@ export function useCreateJournal(): UseMutationResult<Journal | undefined, Error
             return (
               Array.isArray(query.queryKey) &&
               query.queryKey[0] === "paginatedJournals" &&
-              query.queryKey[1] == newJournal.user_skill
+              query.queryKey[1] == newJournal.user_skill.id
             );
           },
         });
@@ -58,6 +94,8 @@ export function useUpdateJournalById(): UseMutationResult<
   { id: number; journalData: FormData }
 > {
   const queryClient = useQueryClient();
+  const { user } = useAuthContext();
+  const username = user?.username;
 
   return useMutation({
     mutationFn: updateJournalById,
@@ -69,7 +107,7 @@ export function useUpdateJournalById(): UseMutationResult<
               return (
                 Array.isArray(query.queryKey) &&
                 query.queryKey[0] === "paginatedJournals" &&
-                query.queryKey[1] == updatedJournal.user_skill
+                (query.queryKey[1] == updatedJournal.user_skill.id || query.queryKey[1] == username)
               );
             },
           },
@@ -90,8 +128,12 @@ export function useUpdateJournalById(): UseMutationResult<
   });
 }
 
-export function useDeleteJournalById(userSkillId: number): UseMutationResult<number | undefined, Error, number> {
+export function useDeleteJournalById(
+  userSkillId: number | undefined
+): UseMutationResult<number | undefined, Error, number> {
   const queryClient = useQueryClient();
+  const { user } = useAuthContext();
+  const username = user?.username;
 
   return useMutation({
     mutationFn: deleteJournalById,
@@ -100,9 +142,10 @@ export function useDeleteJournalById(userSkillId: number): UseMutationResult<num
         queryClient.invalidateQueries({
           predicate: (query) => {
             return (
-              Array.isArray(query.queryKey) &&
-              query.queryKey[0] === "paginatedJournals" &&
-              query.queryKey[1] == userSkillId
+              (Array.isArray(query.queryKey) &&
+                query.queryKey[0] === "paginatedJournals" &&
+                query.queryKey[1] == userSkillId) ||
+              query.queryKey[1] == username
             );
           },
         });
@@ -117,13 +160,9 @@ export function useGenerateJournalSummary(): UseMutationResult<string, Error, st
   });
 }
 
-export function useGenerateJournal(): UseMutationResult<
-  Partial<Journal>,
-  Error,
-  { prompts: Prompts; userSkillId: number }
-> {
+export function useGenerateJournal(): UseMutationResult<Partial<Journal>, Error, Prompts> {
   return useMutation({
-    mutationFn: ({ userSkillId, prompts }) => generateJournal(userSkillId, prompts),
+    mutationFn: generateJournal,
   });
 }
 

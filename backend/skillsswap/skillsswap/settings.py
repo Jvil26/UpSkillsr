@@ -26,6 +26,20 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() == "true"
 
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+else:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -54,19 +68,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-EC2_PRIVATE_IP = os.environ.get("EC2_PRIVATE_IP", "")
-
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "upskillsr.com",
-    "www.upskillsr.com",
-    "api.upskillsr.com",
-    "ec2-3-232-238-67.compute-1.amazonaws.com",
-    "3.232.238.67",
-    "52.5.214.233",
-    EC2_PRIVATE_IP,
-]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 CORS_ALLOWED_ORIGINS = [

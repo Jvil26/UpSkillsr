@@ -42,9 +42,20 @@ export const resourceLinkSchema = z.object({
 
 export const resourceLinksSchema = z.array(resourceLinkSchema);
 
+export const userSkillSchema = z.object({
+  id: z.number(),
+  user: z.number(),
+  skill: skillSchema,
+  proficiency: z.enum(["Beginner", "Intermediate", "Advanced"]),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+});
+
+export const userSkillsSchema = z.array(userSkillSchema);
+
 export const journalSchema = z.object({
   id: z.number(),
-  user_skill: z.number(),
+  user_skill: userSkillSchema,
   title: z.string(),
   text_content: z.string(),
   media: z.string().nullable(),
@@ -69,17 +80,6 @@ export const paginatedJournalsSchema = z.object({
   results: journalsSchema,
 });
 
-export const userSkillSchema = z.object({
-  id: z.number(),
-  user: z.number(),
-  skill: skillSchema,
-  proficiency: z.enum(["Beginner", "Intermediate", "Advanced"]),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
-});
-
-export const userSkillsSchema = z.array(userSkillSchema);
-
 export const userProfileSchema = z.object({
   id: z.number(),
   bio: z.string(),
@@ -101,6 +101,12 @@ export const userSchema = z.object({
 
 export const usersSchema = z.array(userSchema);
 
+export const filtersSchema = z.object({
+  search: z.string(),
+  sort: z.string(),
+  proficiency: z.string(),
+});
+
 export type Users = z.infer<typeof usersSchema>;
 export type User = z.infer<typeof userSchema>;
 export type UserProfile = z.infer<typeof userProfileSchema>;
@@ -113,3 +119,4 @@ export type Journals = z.infer<typeof journalsSchema>;
 export type ResourceLink = z.infer<typeof resourceLinkSchema>;
 export type ResourceLinks = z.infer<typeof resourceLinksSchema>;
 export type PaginatedJournals = z.infer<typeof paginatedJournalsSchema>;
+export type Filters = z.infer<typeof filtersSchema>;

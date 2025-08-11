@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useDebounce } from "use-debounce";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Pagination,
@@ -10,53 +11,92 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { useRouter, usePathname } from "next/navigation";
+import JournalFilters from "./journal-filters";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useFetchUserSkillById } from "@/hooks/users";
-import { useDeleteJournalById, useFetchJournalsByUserSkillId } from "@/hooks/journals";
-import { Loader2, PlusCircle } from "lucide-react";
+import { useDeleteJournalById, useFetchJournalsByUserSkillId, useFetchAllJournals } from "@/hooks/journals";
+import { PlusCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CATEGORY_BG_COLORS, LEVEL_BG_COLORS, VIEW_MODES } from "@/lib/const";
-import { ViewMode } from "@/lib/types";
+import { ViewMode, Filters } from "@/lib/types";
 
 type JournalsListProps = {
-  userSkillId: number;
+  userSkillId?: number;
+  initialPage?: number;
 };
 
-export default function JournalList({ userSkillId }: JournalsListProps) {
+export default function JournalList({ userSkillId, initialPage = 1 }: JournalsListProps) {
   const router = useRouter();
   const pathName = usePathname();
+  const searchParams = useSearchParams();
+  const [filters, setFilters] = useState<Filters>({
+    search: "",
+    sort: "newest_to_oldest",
+    proficiency: "",
+  });
+  const debouncedSearch = useDebounce(filters.search, 500)[0];
+  const [page, setPage] = useState<number>(initialPage);
 
+  const { data: userSkill, isError: isErrorFetchingUserSkill } = useFetchUserSkillById(userSkillId);
   const {
-    data: userSkill,
-    isFetching: isFetchingUserSkill,
-    isError: isErrorFetchingUserSkill,
-  } = useFetchUserSkillById(userSkillId);
-  const [page, setPage] = useState<number>(1);
+    data: journalsBySkill,
+    isError: isErrorBySkill,
+    error: errorBySkill,
+  } = useFetchJournalsByUserSkillId(userSkillId, page, { ...filters, search: debouncedSearch });
   const {
-    data: journals,
-    isFetching: isFetchingJournals,
-    isError: isErrorFetchingJournals,
-  } = useFetchJournalsByUserSkillId(userSkillId, page);
+    data: allJournals,
+    isError: isErrorAll,
+    error: errorAll,
+  } = useFetchAllJournals(page, { ...filters, search: debouncedSearch }, { enabled: !userSkillId });
+
+  const journals = userSkillId ? journalsBySkill : allJournals;
+  const isError = isErrorBySkill || isErrorAll;
+  const error = errorBySkill || errorAll;
+
   const { mutate: deleteJournalById } = useDeleteJournalById(userSkillId);
+
+  const handleFilterChange = (updated: Partial<Filters>) => {
+    setFilters((prev) => {
+      const newFilters = { ...prev, ...updated };
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [type, val] of Object.entries(newFilters)) {
+        if (val) {
+          params.set(type, val);
+        } else {
+          params.delete(type);
+        }
+      }
+      router.replace(`${pathName}?${params.toString()}`);
+
+      return newFilters;
+    });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", newPage.toString());
+    const paramsString = newPage > 1 ? params.toString() : "";
+    router.push(`${pathName}?${paramsString}`);
+  };
 
   const handleDelete = (id: number) => {
     deleteJournalById(id);
   };
 
-  const handleView = (journalId: number, view: ViewMode) => {
-    router.push(`${pathName}/${journalId}?viewMode=${encodeURIComponent(view)}`);
+  const handleView = (journalUserSkillId: number, journalId: number, viewMode: ViewMode) => {
+    router.push(`/skills/${journalUserSkillId}/journals/${journalId}?viewMode=${encodeURIComponent(viewMode)}`);
   };
 
-  if (isFetchingUserSkill || isFetchingJournals) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-muted pt-[calc(var(--nav-height))] p-1 sm:pl-10 sm:pr-7 sm:pb-10">
-        <Loader2 className="w-15 h-15 animate-spin" />
-      </div>
-    );
+  if (isError) {
+    if (error?.message.includes("Invalid page")) {
+      console.error("Redirecting because:", error.message);
+      router.replace("/404");
+    }
   }
 
-  if (isErrorFetchingUserSkill || isErrorFetchingJournals) {
+  if (isErrorFetchingUserSkill) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted pt-[calc(var(--nav-height))] p-1 sm:pl-10 sm:pr-7 sm:pb-10">
         <h1 className="text-[2rem] font-bold">Error fetching from server. Try Again.</h1>
@@ -65,51 +105,76 @@ export default function JournalList({ userSkillId }: JournalsListProps) {
   }
 
   return (
-    <div className="h-screen bg-muted pt-[calc(var(--nav-height))]">
-      <div className="relative flex flex-col lg:flex-row justify-center items-center mt-5">
-        <h1 className="text-[3rem] font-bold text-center underline underline-offset-12">
-          {userSkill?.skill.name} Journals
-        </h1>
-        <div className="static lg:absolute lg:right-10 flex gap-x-2 mt-3">
-          <Badge
-            variant="outline"
-            className={`${
-              userSkill && CATEGORY_BG_COLORS[userSkill?.skill.category]
-            } w-30 h-10 text-[1rem] rounded-full`}
-          >
-            {userSkill?.skill.category}
-          </Badge>
-          <Badge
-            variant="outline"
-            className={`${userSkill && LEVEL_BG_COLORS[userSkill?.proficiency]} w-30 h-10 text-[1rem] rounded-full`}
-          >
-            {userSkill?.proficiency}
-          </Badge>
-        </div>
-      </div>
-      <Accordion type="multiple" className="bg-muted p-10 flex flex-col gap-8">
+    <div className="min-h-screen h-auto bg-muted py-[calc(var(--nav-height))] lg:px-35 px-2 sm:px-5">
+      <h1 className="text-[3rem] font-bold text-center underline underline-offset-12 my-6">
+        {userSkill?.skill.name} Journals
+      </h1>
+      <JournalFilters filters={filters} onChange={handleFilterChange} />
+      {journals?.total === 0 && <h1 className="text-[2rem] font-bold my-8 text-center">No Results Found.</h1>}
+      <Accordion type="multiple" className="bg-muted py-5 flex flex-col gap-5">
         {journals?.results.map((journal) => (
           <AccordionItem
             key={journal.id}
             value={`journal-${journal.id}`}
-            className="border rounded-xl bg-card p-4 shadow-sm"
+            className="border rounded-xl bg-card p-2 sm:p-4 shadow-sm"
           >
-            <AccordionTrigger className="flex-col sm:flex-row justify-between items-center cursor-pointer hover:no-underline">
-              <span className="text-left text-xl font-bold">{journal.title}</span>
-              <span className="text-sm font-bold sm:ml-auto">
-                Created: {new Date(journal.created_at).toLocaleString()}
+            <AccordionTrigger className="flex-col sm:flex-row justify-between items-center cursor-pointer hover:no-underline gap-y-4 sm:gap-y-10 md:py-1 lg:py-4 py-2">
+              <span className="text-left text-[1.5rem] font-bold font-serif">{journal.title}</span>
+              <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:mt-0 sm:ml-auto">
+                <Badge
+                  variant="outline"
+                  className={`${
+                    LEVEL_BG_COLORS[journal.user_skill.proficiency]
+                  } w-27 h-8 text-[0.83rem] rounded-full bg-gray-700 hover:bg-gray-600`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/skills/${journal.user_skill.id}/journals`);
+                  }}
+                >
+                  {journal.user_skill.skill.name}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className={`${
+                    CATEGORY_BG_COLORS[journal.user_skill.skill.category]
+                  } w-27 h-8 text-[0.83rem] rounded-full`}
+                >
+                  {journal.user_skill.skill.category}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className={`${LEVEL_BG_COLORS[journal.user_skill.proficiency]} w-27 h-8 text-[0.83rem] rounded-full`}
+                >
+                  {journal.user_skill.proficiency}
+                </Badge>
+              </div>
+              <span className="text-sm font-bold">
+                Created:{" "}
+                {new Date(journal.created_at).toLocaleString([], {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-5 pb-2">
               <div className="bg-muted/30 p-4 rounded-md border border-border mt-2 shadow-md">
                 <h2 className="text-xl font-semibold mb-1 underline">AI Summary</h2>
-                <p className="whitespace-pre-wrap italic text-[0.975rem]">{journal.summary}</p>
+                <p className="whitespace-pre-wrap font-serif text-[0.975rem]">{journal.summary}</p>
               </div>
               <div className="flex gap-2 mt-2">
-                <Button variant="outline" onClick={() => handleView(journal.id, VIEW_MODES.PREVIEW)}>
+                <Button
+                  variant="outline"
+                  onClick={() => handleView(journal.user_skill.id, journal.id, VIEW_MODES.PREVIEW)}
+                >
                   View
                 </Button>
-                <Button variant="outline" onClick={() => handleView(journal.id, VIEW_MODES.EDIT)}>
+                <Button
+                  variant="outline"
+                  onClick={() => handleView(journal.user_skill.id, journal.id, VIEW_MODES.EDIT)}
+                >
                   Edit
                 </Button>
                 <Button variant="destructive" onClick={() => handleDelete(journal.id)}>
@@ -132,14 +197,14 @@ export default function JournalList({ userSkillId }: JournalsListProps) {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  onClick={() => handlePageChange(Math.max(1, page - 1))}
                   className={page === 1 ? "pointer-events-none opacity-50" : ""}
                 />
               </PaginationItem>
 
               {Array.from({ length: journals.total_pages }).map((_, i) => (
                 <PaginationItem key={i}>
-                  <PaginationLink isActive={page === i + 1} onClick={() => setPage(i + 1)}>
+                  <PaginationLink isActive={page === i + 1} onClick={() => handlePageChange(i + 1)}>
                     {i + 1}
                   </PaginationLink>
                 </PaginationItem>
@@ -147,7 +212,7 @@ export default function JournalList({ userSkillId }: JournalsListProps) {
 
               <PaginationItem>
                 <PaginationNext
-                  onClick={() => setPage((p) => Math.min(journals.total_pages, p + 1))}
+                  onClick={() => handlePageChange(Math.min(journals.total_pages, page + 1))}
                   className={page === journals.total_pages ? "pointer-events-none opacity-50" : ""}
                 />
               </PaginationItem>

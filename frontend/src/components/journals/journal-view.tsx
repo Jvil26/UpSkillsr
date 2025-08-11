@@ -66,7 +66,7 @@ export default function JournalView({
       {summary && (
         <div className="bg-muted/30 p-4 rounded-md border border-border mt-6 shadow-md">
           <h2 className="text-xl font-semibold mb-1 underline">AI Summary</h2>
-          <p className="whitespace-pre-wrap italic text-[0.975rem]">{summary}</p>{" "}
+          <p className="whitespace-pre-wrap text-[0.975rem] font-serif">{summary}</p>{" "}
         </div>
       )}
       {previewMediaUrl && (

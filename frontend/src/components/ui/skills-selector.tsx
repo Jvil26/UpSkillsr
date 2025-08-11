@@ -5,32 +5,40 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Label } from "./label";
 import clsx from "clsx";
-import { z } from "zod";
-import { skillsSchema, Skill, skillSchema } from "@/lib/types";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const SkillSelectorProps = z.object({
-  availableSkills: skillsSchema,
-  selected: skillSchema.nullable(),
-  setSelected: z.function().args(skillSchema.nullable()).returns(z.void()),
-});
+interface SkillSelectorProps<T extends { id: number }> {
+  availableSkills: T[];
+  selectedId: number | null;
+  setSelectedId: (id: number | null) => void;
+  getName: (item: T) => string;
+  disabled?: boolean;
+}
 
-export default function SkillSelector({ availableSkills, selected, setSelected }: z.infer<typeof SkillSelectorProps>) {
-  const toggleSkill = (skill: Skill) => {
-    if (selected?.id == skill.id) {
-      setSelected(null);
+export default function SkillSelector<T extends { id: number }>({
+  availableSkills,
+  selectedId,
+  setSelectedId,
+  getName,
+  disabled,
+}: SkillSelectorProps<T>) {
+  const toggleSkill = (skill: T) => {
+    if (selectedId == skill.id) {
+      setSelectedId(null);
     } else {
-      setSelected(skill);
+      setSelectedId(skill.id);
     }
   };
+
+  const selectedItem = availableSkills.find((s) => s.id == selectedId);
 
   return (
     <div className="mb-4">
       <Label className="block mb-1 font-semibold text-base">Choose a Skill</Label>
       <Popover modal={true}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild disabled={disabled}>
           <Button variant="outline" className="w-full justify-start">
-            {selected?.name}
+            {selectedItem ? getName(selectedItem) : "Select a Skill"}
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -46,11 +54,11 @@ export default function SkillSelector({ availableSkills, selected, setSelected }
                 <CommandItem
                   key={skill.id}
                   onSelect={() => toggleSkill(skill)}
-                  className={clsx("cursor-pointer", selected?.id === skill.id && "bg-muted")}
+                  className={clsx("cursor-pointer", selectedId === skill.id && "bg-muted")}
                 >
-                  {skill.name}
+                  {getName(skill)}
                   <Check
-                    className={clsx("mr-2 h-4 w-4 ml-auto", selected?.id === skill.id ? "opacity-100" : "opacity-0")}
+                    className={clsx("mr-2 h-4 w-4 ml-auto", selectedId === skill.id ? "opacity-100" : "opacity-0")}
                   />
                 </CommandItem>
               ))}

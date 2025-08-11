@@ -1,8 +1,18 @@
 import React from "react";
 import { JournalList } from "@/components/journals";
 
-export default async function SkillJournalsPage({ params }: { params: Promise<{ slug: number }> }) {
+export default async function SkillJournalsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: number }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const { slug: userSkillId } = await params;
 
-  return <JournalList userSkillId={userSkillId} />;
+  const sp = await searchParams;
+  const pageNumber = Number(sp.page);
+  const initialPage = Number.isFinite(pageNumber) && pageNumber > 0 ? pageNumber : 1;
+
+  return <JournalList userSkillId={Number(userSkillId)} initialPage={initialPage} />;
 }

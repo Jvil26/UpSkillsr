@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import AmplifyWrapper from "./amplifyWrapper";
+import AmplifyProvider from "./amplify-provider";
 import NavMenu from "@/components/nav/navigation";
 import { AuthContextProvider } from "@/context/auth";
-import ClientProvider from "./clientProvider";
+import ClientProvider from "./client-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthGuard } from "@/components/nav";
 
@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ClientProvider>
           <AuthContextProvider>
-            <AmplifyWrapper />
+            <AmplifyProvider />
             <NavMenu />
             <AuthGuard>
               {children}

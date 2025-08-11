@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import JournalView from "./journal-view";
 import JournalAIInputPanel from "./journal-ai-input-panel";
 import { Button } from "../ui/button";
@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { PROMPT_LABELS, VIEW_MODES } from "@/lib/const";
 import JournalEdit from "./journal-edit";
-
 import {
   useCreateJournal,
   useUpdateJournalById,
@@ -18,16 +17,21 @@ import {
   useBatchUpdateResourceLinks,
 } from "@/hooks/journals";
 import { ViewMode } from "@/lib/types";
+// import { useFetchUserSkills } from "@/hooks/users";
+// import SkillSelector from "../ui/skills-selector";
 
 type JournalCreatorProps = {
   isNew: boolean;
   journalId: number;
-  userSkillId: number;
+  userSkillId?: number;
 };
 
 export default function JournalCreator({ isNew, journalId, userSkillId }: JournalCreatorProps) {
   const router = useRouter();
+  const pathName = usePathname();
   const searchParams = useSearchParams();
+  // const { data: userSkills } = useFetchUserSkills();
+  // const [selectedUserSkillId, setSelectedUserSkillId] = useState<number | null>(userSkillId ?? null);
   const {
     data: journal,
     isFetching: isFetchingJournal,
@@ -75,7 +79,9 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
 
   const handleViewChange = (viewMode: ViewMode) => {
     setViewMode(viewMode);
-    router.replace(`/skills/${userSkillId}/journals/${isNew ? "new" : journalId}?viewMode=${viewMode}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("viewMode", viewMode);
+    router.replace(`${pathName}?${params.toString()}`);
   };
 
   const handlePromptInputChange = (id: string, value: string) => {
@@ -110,8 +116,12 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
         toast.error("Failed to journal. Content cannot be empty");
         return;
       }
+      // if (!selectedUserSkillId) {
+      //   toast.error("Selecting a user skill is required.");
+      //   return;
+      // }
       const formData = new FormData();
-      formData.append("user_skill", String(userSkillId));
+      formData.append("user_skill_id", String(userSkillId));
       formData.append("title", title);
       formData.append("text_content", textContent);
       formData.append("summary", summary);
@@ -162,7 +172,7 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
         };
       });
 
-      const journalData = await generateJournal({ userSkillId, prompts });
+      const journalData = await generateJournal(prompts);
       if (journalData && journalData.title?.trim() && journalData.text_content?.trim() && journalData.summary?.trim()) {
         setTitle(journalData.title);
         setTextContent(journalData.text_content);
@@ -226,6 +236,13 @@ export default function JournalCreator({ isNew, journalId, userSkillId }: Journa
                 {createPending || updatePending ? "Saving..." : "Save"}
               </Button>
             </div>
+            {/* <SkillSelector
+              availableSkills={userSkills ?? []}
+              selectedId={selectedUserSkillId}
+              setSelectedId={setSelectedUserSkillId}
+              getName={(userSkill) => userSkill.skill.name}
+              disabled={userSkillId !== undefined && isNew}
+            /> */}
             <JournalAIInputPanel
               promptLabels={PROMPT_LABELS}
               answers={answers}
